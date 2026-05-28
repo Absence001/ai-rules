@@ -79,7 +79,13 @@ ai-rules/
 
 ### Новый проект
 
-Скопируй `templates/CLAUDE.md` в корень нового проекта, заполни project-specific контекст. Глобальные правила (AGENTS.md, memory-bank) грузятся автоматически.
+Для каждого нового проекта:
+
+1. Скопировать `templates/CLAUDE.md` → `<project>/CLAUDE.md`
+2. Скопировать `templates/AGENTS.md` → `<project>/AGENTS.md`
+3. Создать `<project>/artifacts/project-state.md` из `templates/project-state.md`
+4. Заполнить project-specific поля (имя, тип, стек, Figma link, ai-rules commit)
+5. Глобальные правила грузятся автоматически через `~/.claude/CLAUDE.md` и `~/.codex/AGENTS.md`
 
 ## Обновление правил
 
@@ -110,7 +116,7 @@ sync-rules.bat
 | Critique / handoff / microcopy | `pd-workflows/*.md` |
 | Accessibility | `pd-workflows/accessibility-audit.md` |
 | Component documentation | `pd-workflows/component-documentation.md` |
-| Бaг / диагностика | `code-diagnostics/code-diagnostics.md` |
+| Баг / диагностика | `code-diagnostics/code-diagnostics.md` |
 
 Детали — в `AGENTS.md`.
 

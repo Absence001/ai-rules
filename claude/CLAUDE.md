@@ -44,7 +44,7 @@
 | Visual polish / craft | `craft-audit` |
 | Screenshot → код | `screenshot-to-code` |
 | Frontend / React | `frontend-impl` |
-| Бaг / диагностика | `code-diagnostics` |
+| Баг / диагностика | `code-diagnostics` |
 
 > Skills как Claude-native механизм — будут реализованы отдельно. Пока — используй прямой routing из `AGENTS.md`.
 

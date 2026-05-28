@@ -9,7 +9,7 @@
 ## Правила использования index
 
 1. **Сначала прочитай этот файл** — он короткий (~3k токенов вместо ~30k всех правил).
-2. Определи тип задачи (1 из 14 ниже).
+2. Определи тип задачи по таблице ниже.
 3. Прочитай **только** перечисленные файлы.
 4. `artifacts/research/*` — НЕ читать в runtime. Это archive (history of how rules were built).
 5. `artifacts/rules-audit.md` и `rules-proposal.md` — НЕ читать в runtime. Archive.
