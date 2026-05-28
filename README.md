@@ -1,18 +1,19 @@
 # ai-rules
 
-Единое хранилище правил для Claude Code и Cursor.
+Единое хранилище правил для Claude Code и Codex CLI.
 
 ## Структура
 
 ```
 ai-rules/
-├── AGENTS.md           — роль и поведение Claude-агента
+├── AGENTS.md           — роль и поведение агента (читают оба)
 ├── memory-bank/        — знания: дизайн-система, IA, research, craft
 ├── directives/         — пошаговые инструкции для конкретных операций
-├── cursor/
-│   └── rules.md        — правила для Cursor
-└── templates/
-    └── CLAUDE.md       — шаблон CLAUDE.md для нового проекта
+├── codex/
+│   └── rules.md        — дополнительные правила для Codex
+├── templates/
+│   └── CLAUDE.md       — шаблон CLAUDE.md для нового проекта
+└── sync-rules.bat      — синхронизация AGENTS.md в ~/.codex/
 ```
 
 ## Подключение
@@ -25,9 +26,9 @@ ai-rules/
 @C:/Users/PC/ai-rules/AGENTS.md
 ```
 
-### Cursor (глобально)
+### Codex CLI (глобально)
 
-Settings → Rules for AI → вставить содержимое `cursor/rules.md`
+`~/.codex/AGENTS.md` — копия `ai-rules/AGENTS.md`. После изменений запусти `sync-rules.bat`.
 
 ### Новый проект
 
