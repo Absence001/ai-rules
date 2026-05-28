@@ -2,16 +2,37 @@
 
 Единое хранилище правил для Claude Code и OpenAI Codex CLI. Подход: общее ядро + tool-specific дополнения + модульный memory-bank.
 
+## Источник правды
+
+- **GitHub** ([github.com/Absence001/ai-rules](https://github.com/Absence001/ai-rules)) — **source of truth**.
+- **Локальный clone** (`C:/Users/PC/ai-rules`) — runtime cache. Изменения здесь нужно коммитить и пушить.
+- При расхождении — GitHub приоритет, локально делаем `git pull`.
+
+## Bootstrap
+
+```
+RULES_ROOT = C:/Users/PC/ai-rules
+```
+
+Все routing-пути в правилах разрешаются относительно `RULES_ROOT`.
+
+В новом проекте:
+1. Скопировать `templates/CLAUDE.md` и `templates/AGENTS.md` в корень проекта.
+2. Создать `./artifacts/project-state.md` из `templates/project-state.md`.
+3. Заполнить project-specific поля.
+4. Глобальные правила (через `~/.claude/CLAUDE.md` и `~/.codex/AGENTS.md`) грузятся автоматически.
+
 ## Структура
 
 ```
 ai-rules/
 ├── AGENTS.md                              ← общее ядро (роль, язык, routing, gates)
+├── rules-index.md                         ← короткий маршрутизатор (читать первым)
 │
 ├── claude/CLAUDE.md                       ← Claude-specific (оркестратор, Figma MCP)
 ├── codex/AGENTS.md                        ← Codex-specific (code executor, RSC defaults)
 │
-├── memory-bank/                           ← shared knowledge
+├── memory-bank/                           ← shared knowledge (runtime)
 │   ├── meta/                              — pipeline, calibration, operating-principles
 │   ├── discovery/                         — brief, SRGID, sources, context
 │   ├── ia-flow/                           — IA, flow, UX evaluation
@@ -23,9 +44,20 @@ ai-rules/
 │   └── code-diagnostics/                  — баги и код
 │
 ├── directives/                            — короткие пошаговые инструкции
-├── templates/CLAUDE.md                    — шаблон для нового проекта
-├── artifacts/                             — research, audit, proposal (история)
-└── sync-rules.bat                         — синхронизация в ~/.codex/
+│
+├── templates/                             — для нового проекта
+│   ├── CLAUDE.md                          — bootstrap для Claude
+│   ├── AGENTS.md                          — bootstrap для Codex
+│   └── project-state.md                   — shared state Claude ↔ Codex
+│
+├── artifacts/                             — history (NOT runtime)
+│   ├── research/                          — research топ-специалистов
+│   ├── rules-audit.md                     — audit предыдущей версии
+│   └── rules-proposal.md                  — план изменений
+│
+├── archive/                               — устаревшие файлы
+│
+└── sync-rules.bat                         — синхронизация ~/.codex/ + проверка ~/.claude/
 ```
 
 ## Подключение

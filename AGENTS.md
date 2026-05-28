@@ -2,6 +2,23 @@
 
 Универсальное ядро правил для Claude Code и OpenAI Codex CLI. Содержит общие принципы. Tool-specific правила — в `claude/CLAUDE.md` и `codex/AGENTS.md`.
 
+## RULES_ROOT (где лежат правила)
+
+```
+RULES_ROOT = C:/Users/PC/ai-rules
+```
+
+**Все routing-пути** в этом файле и в `claude/CLAUDE.md` / `codex/AGENTS.md` разрешаются относительно `RULES_ROOT`.
+
+**В проекте:**
+- Если есть локальный `memory-bank/` в текущем проекте — используй его (overrides global).
+- Если нет — читай из `RULES_ROOT/memory-bank/`.
+- Project-specific артефакты живут в `./artifacts/` текущего проекта.
+
+## Routing-стратегия (token economy)
+
+**Не читай routing-секцию ниже как catalog.** Сначала смотри `RULES_ROOT/rules-index.md` — там короткий index «тип задачи → 1-3 файла». Полное routing-описание ниже — fallback на случай неясного типа задачи.
+
 ## Определение роли
 
 «Agent» = LLM, использующий tools в цикле для достижения цели *(Anthropic)*. Конкретная роль зависит от инструмента:
