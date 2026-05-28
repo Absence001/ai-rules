@@ -2,41 +2,84 @@
 
 ## Главный принцип
 
-Сначала выбрать один основной visual register. Не смешивать стили без причины.
+**Один основной visual register на проект.** Не смешивать стили без причины. Регистр задаётся на этапе brief/research, не выбирается импровизацией в screens.
 
-## Registers
+## Регистры
 
 ### product-app
-Для SaaS, dashboard, admin, tools. Дизайн обслуживает задачу. Меньше экспрессии, больше ясности.
+**Когда:** SaaS, dashboard, admin, tools, B2B.
+**Характер:** дизайн обслуживает задачу, минимум экспрессии, максимум ясности.
+**Допускает:** subtle motion, system fonts, restrained palette.
 
 ### mobile-product
-Для мобильных приложений и flow. App-native, touch-first, readable, platform-aware.
+**Когда:** мобильные приложения и flow.
+**Характер:** app-native, touch-first, readable, platform-aware (см. `platforms/mobile-platform-guidelines.md`).
+**Допускает:** platform-conventional animations, native pickers, haptics.
 
 ### brand-marketing
-Для лендингов, портфолио, промо. Дизайн сам является частью продукта. Можно больше композиционной выразительности.
+**Когда:** лендинги, портфолио, промо, рекламные кампании.
+**Характер:** дизайн сам — часть продукта, expressive композиция.
+**Допускает:** expressive motion, large type, branded animations, custom shapes, fullscreen visuals.
+**НЕ допускает:** убирать a11y baseline, нарушать contrast WCAG AA.
 
 ### editorial-minimal
-Спокойный премиальный стиль: типографика, пространство, muted colors, минимум эффектов.
+**Когда:** премиальный контент, журналы, longread.
+**Характер:** типографика, пространство, muted colors, минимум эффектов.
+**Допускает:** custom typography, generous whitespace, asymmetric layouts.
 
 ### industrial-brutalist
-Жесткая сетка, высокий типографический контраст, tactical/print feel, резкие блоки, один акцент. Включать только если задача явно визуальная/брендовая.
+**Когда:** brand-инициативы с явным запросом, art-direction, niche-проекты.
+**Характер:** жёсткая сетка, высокий типографический контраст, tactical/print feel, резкие блоки, один акцент.
+**НЕ применять** к финтех/product UI без явного запроса от пользователя.
 
 ### premium-soft
-Мягкий премиальный UI: warm neutrals, subtle shadows, restrained motion, high spacing discipline.
+**Когда:** премиальные продукты с уклоном в comfort (wellness, lifestyle).
+**Характер:** warm neutrals, subtle shadows, restrained motion, high spacing discipline.
+**Допускает:** soft gradients (subtle), layered shadows, refined micro-details.
 
 ### image-reconstruction
-Режим точного восстановления по скриншоту. Приоритет: визуальное совпадение, layout, hierarchy, proportions.
+**Когда:** точное восстановление по скриншоту.
+**Характер:** приоритет — визуальное совпадение, layout, hierarchy, proportions.
+**Допускает:** воспроизведение визуальной системы оригинала (с adaptation если нужно).
 
-## Dials
+## Dials (фиксируется до реализации)
 
-Перед реализацией зафиксировать:
+| Параметр | Значения |
+|---|---|
+| **Design variance** | low / medium / high |
+| **Motion intensity** | none / subtle / expressive |
+| **Visual density** | low / medium / high |
 
-- Design variance: low / medium / high
-- Motion intensity: none / subtle / expressive
-- Visual density: low / medium / high
+Фиксируется в `artifacts/brief.md` или `craft-audit.md`.
 
-## Конфликты
+## Color scales
 
-- Inter/system font допустим в product-app, но нежелателен в premium/brand/editorial без причины.
-- Активный motion допустим в brand, но опасен в product flow.
-- Brutalist register не применять к финтех/product UI без явного запроса.
+Из Refactoring UI:
+
+- **5 семейств цвета:** brand + grey + success + warning + danger (+ info опционально)
+- **Каждое семейство — 9 ступеней** (50/100/200/300/400/500/600/700/800/900)
+- **Saturation падает на крайних ступенях** — чистый цвет работает в середине, на светлых и тёмных нужна шкала «к серому»
+
+## Конфликты regiстров
+
+| Конфликт | Резолюция |
+|---|---|
+| Inter / system font в premium / brand / editorial | Не использовать без явной причины |
+| Активный motion в product flow | Снизить до subtle |
+| Brutalist в финтех / product UI | Не применять без явного запроса |
+| Glassmorphism в product-app | Не применять (mobile-craft anti-pattern) |
+| Default shadow в premium-soft | Использовать layered shadows |
+
+## Выбор register — checklist
+
+Перед стартом задаём:
+
+1. Тип продукта (B2B/B2C/brand/internal)?
+2. Платформа (web/mobile/cross)?
+3. Контекст использования (daily tool / occasional / one-time)?
+4. Bren — есть guidelines?
+5. Аудитория — кто?
+
+→ Регистр.
+
+Если ответы пересекают несколько registers — выбираем **доминирующий** + dials.
