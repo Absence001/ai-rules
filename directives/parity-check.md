@@ -1,18 +1,12 @@
-# Directive: parity-check
+# Directive: parity-check (redirect)
 
-## Цель
+**Note:** Эта директива объединена с figma-mcp-workflow.
 
-Проверить соответствие React DS ↔ Figma DS.
+Используй: `memory-bank/design-system/figma-code-parity.md` — там полный workflow для:
+- Figma ↔ код mirror naming
+- Component parity audit
+- Token sync
+- Code Connect setup
+- Parity report формат
 
-## Проверить
-
-- Имена компонентов.
-- Props ↔ variant properties.
-- Variant values.
-- Tokens.
-- States.
-- Missing components.
-
-## Результат
-
-`artifacts/parity-report.md` со статусом PASS / PARTIAL / FAIL.
+Файл сохранён как redirect для backward compatibility ссылок.
