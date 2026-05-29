@@ -11,9 +11,20 @@ RULES_ROOT = C:/Users/PC/ai-rules
 **Все routing-пути** в этом файле и в `claude/CLAUDE.md` / `codex/AGENTS.md` разрешаются относительно `RULES_ROOT`.
 
 **В проекте:**
-- Если есть локальный `memory-bank/` в текущем проекте — используй его (overrides global).
-- Если нет — читай из `RULES_ROOT/memory-bank/`.
+- По умолчанию новый проект **не хранит локальные правила**: не создавай `AGENTS.md`, `CLAUDE.md` и `memory-bank/` в каждой новой папке без явной причины.
+- Базовые правила и routing бери из `RULES_ROOT`.
+- Если в проекте уже есть локальный `memory-bank/` — считай это legacy override и используй его только для project-specific знаний, которые действительно нельзя держать глобально.
 - Project-specific артефакты живут в `./artifacts/` текущего проекта.
+
+## Bootstrap для нового проекта
+
+Базовый сценарий:
+
+1. Создай новую папку проекта.
+2. При необходимости создай `./artifacts/project-state.md`.
+3. Все общие правила, routing и memory-bank бери из `RULES_ROOT`.
+
+То есть для обычного старта **не нужно** копировать в проект `AGENTS.md`, `CLAUDE.md` или весь `memory-bank/`.
 
 ## Routing-стратегия (token economy)
 

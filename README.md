@@ -17,10 +17,12 @@ RULES_ROOT = C:/Users/PC/ai-rules
 Все routing-пути в правилах разрешаются относительно `RULES_ROOT`.
 
 В новом проекте:
-1. Скопировать `templates/CLAUDE.md` и `templates/AGENTS.md` в корень проекта.
-2. Создать `./artifacts/project-state.md` из `templates/project-state.md`.
+1. Создать новую папку проекта.
+2. При необходимости создать `./artifacts/project-state.md` из `templates/project-state.md`.
 3. Заполнить project-specific поля.
 4. Глобальные правила (через `~/.claude/CLAUDE.md` и `~/.codex/AGENTS.md`) грузятся автоматически.
+
+По умолчанию **не нужно** копировать в каждый проект `AGENTS.md`, `CLAUDE.md` и `memory-bank/`.
 
 ## Структура
 
@@ -45,9 +47,9 @@ ai-rules/
 │
 ├── directives/                            — короткие пошаговые инструкции
 │
-├── templates/                             — для нового проекта
-│   ├── CLAUDE.md                          — bootstrap для Claude
-│   ├── AGENTS.md                          — bootstrap для Codex
+├── templates/                             — опциональные шаблоны
+│   ├── CLAUDE.md                          — legacy bootstrap, если нужен локальный override
+│   ├── AGENTS.md                          — legacy bootstrap, если нужен локальный override
 │   └── project-state.md                   — shared state Claude ↔ Codex
 │
 ├── artifacts/                             — history (NOT runtime)
@@ -81,11 +83,11 @@ ai-rules/
 
 Для каждого нового проекта:
 
-1. Скопировать `templates/CLAUDE.md` → `<project>/CLAUDE.md`
-2. Скопировать `templates/AGENTS.md` → `<project>/AGENTS.md`
-3. Создать `<project>/artifacts/project-state.md` из `templates/project-state.md`
-4. Заполнить project-specific поля (имя, тип, стек, Figma link, ai-rules commit)
-5. Глобальные правила грузятся автоматически через `~/.claude/CLAUDE.md` и `~/.codex/AGENTS.md`
+1. Создать папку проекта
+2. При необходимости создать `<project>/artifacts/project-state.md` из `templates/project-state.md`
+3. Заполнить project-specific поля (имя, тип, стек, Figma link, ai-rules commit)
+4. Глобальные правила грузятся автоматически через `~/.claude/CLAUDE.md` и `~/.codex/AGENTS.md`
+5. Не копировать в проект `AGENTS.md`, `CLAUDE.md` и `memory-bank/`, если не нужен осознанный локальный override
 
 ## Обновление правил
 

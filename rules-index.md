@@ -14,6 +14,7 @@
 4. `artifacts/research/*` — НЕ читать в runtime. Это archive (history of how rules were built).
 5. `artifacts/rules-audit.md` и `rules-proposal.md` — НЕ читать в runtime. Archive.
 6. Project artifacts (`./artifacts/project-state.md`, `brief.md`, etc.) — читать **первыми** перед runtime rules.
+7. В новом проекте по умолчанию **не создавать локальные копии** `AGENTS.md`, `CLAUDE.md` и `memory-bank/`: правила читаются из `RULES_ROOT`.
 
 ---
 
@@ -64,6 +65,8 @@
 | Тип неясен | Спроси пользователя «это про X или Y?» — не угадывай |
 | Локальный `memory-bank/` в проекте | Использовать его, не глобальный |
 | Локальный `artifacts/project-state.md` | **Читать первым**, до любых rules |
+
+Норма для новых проектов: только папка проекта + при необходимости `artifacts/`. Общие правила не дублируются локально.
 
 ## Anti-patterns
 

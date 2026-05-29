@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 echo Syncing ai-rules globally...
 
 set RULES_ROOT=C:\Users\PC\ai-rules
@@ -24,9 +25,10 @@ echo. >> "%CODEX_HOME%\AGENTS.md.tmp"
 echo RULES_ROOT = %RULES_ROOT% >> "%CODEX_HOME%\AGENTS.md.tmp"
 echo. >> "%CODEX_HOME%\AGENTS.md.tmp"
 echo В новом проекте: >> "%CODEX_HOME%\AGENTS.md.tmp"
-echo 1. Сначала читать ./artifacts/project-state.md если есть. >> "%CODEX_HOME%\AGENTS.md.tmp"
-echo 2. Затем RULES_ROOT/rules-index.md для routing. >> "%CODEX_HOME%\AGENTS.md.tmp"
-echo 3. Грузить только нужные правила. >> "%CODEX_HOME%\AGENTS.md.tmp"
+echo 1. Не копировать локально AGENTS.md, CLAUDE.md и memory-bank без особой причины. >> "%CODEX_HOME%\AGENTS.md.tmp"
+echo 2. Сначала читать ./artifacts/project-state.md если есть. >> "%CODEX_HOME%\AGENTS.md.tmp"
+echo 3. Затем RULES_ROOT/rules-index.md для routing. >> "%CODEX_HOME%\AGENTS.md.tmp"
+echo 4. Грузить только нужные правила из RULES_ROOT. >> "%CODEX_HOME%\AGENTS.md.tmp"
 
 move /Y "%CODEX_HOME%\AGENTS.md.tmp" "%CODEX_HOME%\AGENTS.md" >nul
 
