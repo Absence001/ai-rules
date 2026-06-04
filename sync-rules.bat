@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 chcp 65001 >nul
 echo Syncing ai-rules globally...
 
@@ -73,7 +74,12 @@ if not exist "%CLAUDE_HOME%\skills" mkdir "%CLAUDE_HOME%\skills"
 xcopy /E /Y /I /Q "%RULES_ROOT%\skills" "%CLAUDE_HOME%\skills" >nul
 
 if %errorlevel%==0 (
-    echo [OK] %CLAUDE_HOME%\skills synced ^(10 skills^)
+    REM Dynamic count: count SKILL.md files in skills/ subdirectories
+    set SKILL_COUNT=0
+    for /D %%D in ("%RULES_ROOT%\skills\*") do (
+        if exist "%%D\SKILL.md" set /A SKILL_COUNT+=1
+    )
+    echo [OK] %CLAUDE_HOME%\skills synced ^(!SKILL_COUNT! skills^)
 ) else (
     echo [ERROR] Failed to sync Skills
 )
@@ -81,3 +87,4 @@ if %errorlevel%==0 (
 echo.
 echo Done.
 pause
+endlocal

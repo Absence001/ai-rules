@@ -9,7 +9,7 @@ intent: |
   User wants to structure screens, flows, or navigation. Activate also when designing decision
   trees (modal vs drawer vs screen vs wizard) or when scope of screens is unclear.
 task_type: outcome-gradable
-related_skills: [srgid-research, design-system, screens-and-screenshots]
+related_skills: [srgid-research, design-system, screenshot-to-code]
 data_access_level: raw
 ---
 

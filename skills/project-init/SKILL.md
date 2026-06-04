@@ -1,13 +1,13 @@
 ---
 name: project-init
 status: active
-description: Bootstrap a new project from ai-rules templates. Use when starting a brand new project folder, when no project-state.md exists yet, or when user says "новый проект", "kickoff", "let's start a new project". Scaffolds CLAUDE.md + AGENTS.md + artifacts/project-state.md from templates, fills in project name / type / stack / ai-rules commit SHA, and prepares pipeline for first stage (brief).
+description: Bootstrap a new project from ai-rules. Default mode creates only ./artifacts/project-state.md (Material Passport) — global rules are read from RULES_ROOT. Local CLAUDE.md / AGENTS.md / memory-bank/ are NOT created by default. They are created only when user explicitly requests a local override (e.g. "сделай локальные правила", "local override", "стандарт проекта зафиксировать локально"). Use when starting a brand new project folder, when no project-state.md exists yet, or when user says "новый проект", "kickoff", "let's start a new project".
 trigger_keywords:
   ru: ["новый проект", "создать проект", "bootstrap", "scaffold", "стартуем", "init", "kickoff"]
   en: ["new project", "bootstrap", "scaffold", "init", "kickoff", "start project"]
 intent: |
-  User wants to start a new project in a fresh folder. Project lacks any of:
-  CLAUDE.md / AGENTS.md / artifacts/project-state.md. Activate also when user
+  User wants to start a new project in a fresh folder. Project lacks artifacts/project-state.md.
+  Default behavior: create only project-state.md, keep rules global. Activate also when user
   is unsure how to start.
 task_type: outcome-gradable
 related_skills: [product-brief, pipeline-control]
@@ -16,119 +16,147 @@ data_access_level: raw
 
 # Project Init
 
-Bootstrap нового проекта из шаблонов ai-rules. Идея из danjdewhurst/story-skills `story-init`.
+Bootstrap нового проекта из шаблонов ai-rules. **Default = global-only:** локально создаётся только `artifacts/project-state.md`. Локальные `CLAUDE.md` / `AGENTS.md` / `memory-bank/` создаются **только по явному запросу пользователя** как conscious local override.
 
 ## Initial Response (обязательно при первом вызове)
 
 При активации — сразу:
 
-> «Активирован project-init. Bootstrap нового проекта из ai-rules templates.
+> «Активирован project-init. Bootstrap нового проекта из ai-rules.
+>
+> **По умолчанию (global-only):** создам только `./artifacts/project-state.md`. Глобальные правила (`AGENTS.md`, `CLAUDE.md`, `memory-bank/`) живут в `RULES_ROOT = C:/Users/PC/ai-rules` и грузятся автоматически через `~/.claude/CLAUDE.md` и `~/.codex/AGENTS.md` — копировать их в проект не нужно.
 >
 > Мне нужно знать:
-> 1. **Имя проекта** (например `prayd-landing`, `claude-orchestrator-craft`)
+> 1. **Имя проекта**
 > 2. **Путь** — где создавать (или текущая папка?)
 > 3. **Тип проекта** — лендинг / mobile app / SaaS / DS / другое
-> 4. **Стек** (если уже решён — React + Next.js + Tailwind по умолчанию Lee Robinson, или твой)
+> 4. **Стек** (по умолчанию Lee Robinson defaults)
 > 5. **Figma файл** — есть ссылка?
 >
-> После твоих ответов:
-> - Создам `CLAUDE.md`, `AGENTS.md`, `artifacts/project-state.md` из templates
-> - Заполню всё, кроме того что ты ещё не знаешь (помечу `[TBD]`)
-> - Зафиксирую SHA текущего ai-rules коммита (так что project знает на какую версию правил рассчитан)
-> - Дам команду на следующий шаг — обычно `product-brief`.»
+> Если **нужны локальные `CLAUDE.md` / `AGENTS.md`** (project-specific override правил) — скажи явно: «сделай локальные правила» или «нужен local override». По умолчанию я их **не создаю**.»
 
 ## Когда триггерится
 
-- Пустая папка / папка без `CLAUDE.md`
+- Пустая папка / папка без `artifacts/project-state.md`
 - Пользователь говорит «новый проект», «давай начнём», «kickoff»
-- Существует `CLAUDE.md` но нет `artifacts/project-state.md`
 
-## Что читать
+## Default mode (global-only) — основной режим
 
-1. **`RULES_ROOT/templates/CLAUDE.md`** — шаблон для Claude
-2. **`RULES_ROOT/templates/AGENTS.md`** — шаблон для Codex
-3. **`RULES_ROOT/templates/project-state.md`** — Material Passport шаблон
+### Что читать
 
-## Порядок
+1. **`RULES_ROOT/templates/project-state.md`** — Material Passport шаблон
+2. **`RULES_ROOT/AGENTS.md`** — context для понимания global-only policy
 
-### 1. Сбор информации (один раунд)
-
-Спросить пользователя:
-
-| Поле | Если не знает |
-|---|---|
-| Имя проекта | Обязательно. Без него файлы не валидируются |
-| Путь к папке | Если не указан — текущая `cwd` |
-| Тип проекта | `[TBD]` если не уверен — заполним после brief |
-| Стек | По умолчанию Lee Robinson: Next.js + TS + Tailwind + shadcn/ui |
-| Figma файл | `[TBD]` если ещё нет |
-
-### 2. Получить current ai-rules SHA
-
-```bash
-cd C:/Users/PC/ai-rules && git rev-parse --short HEAD
-```
-
-Этот SHA пойдёт в каждый template (так проект знает версию правил).
-
-### 3. Создать файлы
+### Что создать
 
 В корне проекта:
 
 ```
 <project>/
-├── CLAUDE.md                  ← из templates/CLAUDE.md (заполнен)
-├── AGENTS.md                  ← из templates/AGENTS.md (заполнен)
 └── artifacts/
-    └── project-state.md       ← из templates/project-state.md (Material Passport, заполнен)
+    └── project-state.md       ← из templates/project-state.md (заполнен)
 ```
 
-**Заполнить переменные:**
+**Это всё.** `CLAUDE.md`, `AGENTS.md`, `memory-bank/` локально **не создаются** — они уже доступны глобально через `RULES_ROOT`.
+
+### Заполнить переменные
 
 | Placeholder | Значение |
 |---|---|
 | `[PROJECT_NAME]` | имя проекта |
 | `[YYYY-MM-DD]` | сегодняшняя дата |
-| `[SHA]` | git rev-parse --short HEAD из ai-rules |
-| Тип / стек / Figma | по ответам |
+| `[SHA]` | `git rev-parse --short HEAD` в `RULES_ROOT` |
+| Тип / стек / Figma | по ответам пользователя |
 | Цель (outcome) | `[TBD — заполнить после product-brief]` |
 
-### 4. Первая Lineage entry
-
-В `project-state.md` раздел 4 — первая запись:
+### Первая Lineage entry
 
 ```markdown
-| 1 | <today> | Project bootstrapped | Claude (project-init skill) | RULES_ROOT@<SHA> templates | CLAUDE.md, AGENTS.md, artifacts/project-state.md | Run product-brief skill to gather brief |
+| 1 | <today> | Project bootstrapped (default global-only mode) | Claude (project-init skill) | RULES_ROOT@<SHA>/templates/project-state.md | artifacts/project-state.md | Run product-brief skill to gather brief |
 ```
 
-### 5. Acknowledge и handoff
-
-Сказать пользователю:
+### Acknowledge
 
 > «Готово. Структура создана:
-> - `<project>/CLAUDE.md`
-> - `<project>/AGENTS.md`
 > - `<project>/artifacts/project-state.md`
 >
-> ai-rules commit: `<SHA>` (если правила обновятся — `git pull` в ai-rules, project знает на какую версию рассчитан).
+> Глобальные правила грузятся автоматически из `RULES_ROOT = C:/Users/PC/ai-rules` (`AGENTS.md` + `claude/CLAUDE.md` + `codex/AGENTS.md` + `memory-bank/`). Текущий ai-rules commit: `<SHA>`.
 >
 > **Next step:** активируй `product-brief` skill — соберём бриф (4-6 вопросов одним раундом).»
+
+## Local override mode — только по явному запросу
+
+### Когда триггерится
+
+Только если пользователь **явно** говорит одно из:
+- «сделай локальные правила»
+- «local override»
+- «зафиксировать стандарт проекта локально»
+- «нужны project-specific rules»
+- «копируй CLAUDE.md / AGENTS.md в проект»
+
+Любая другая формулировка → **уточнить**, нужен ли override (не создавать без подтверждения).
+
+### Что создать (override mode)
+
+```
+<project>/
+├── CLAUDE.md                  ← из templates/CLAUDE.md (override для Claude)
+├── AGENTS.md                  ← из templates/AGENTS.md (override для Codex)
+└── artifacts/
+    └── project-state.md       ← из templates/project-state.md
+```
+
+Опционально (только если нужны project-specific правила, отличные от global):
+
+```
+<project>/
+└── memory-bank/              ← project-specific overrides ТОЛЬКО для тем где default global rules недостаточны
+    └── <category>/
+        └── <file>.md
+```
+
+### Lineage entry (override mode)
+
+```markdown
+| 1 | <today> | Project bootstrapped with local override | Claude + User explicit request | User said: "<точная формулировка>" | CLAUDE.md, AGENTS.md, artifacts/project-state.md | Run product-brief skill |
+```
+
+В колонке «Provenance» **обязательно** зафиксировать явную фразу пользователя — это conscious decision.
+
+### Acknowledge (override mode)
+
+> «Готово. Структура создана с **local override**:
+> - `<project>/CLAUDE.md` (override Claude rules)
+> - `<project>/AGENTS.md` (override Codex rules)
+> - `<project>/artifacts/project-state.md`
+>
+> ⚠️ Local override активен. Глобальные правила работают как **fallback**. Любое изменение global rules в `RULES_ROOT` **не** применится автоматически — нужно вручную синхронизировать.
+>
+> **Next step:** активируй `product-brief` skill.»
 
 ## Anti-Patterns
 
 | Pattern (WRONG) | Why it fails | Correct (RIGHT) |
 |---|---|---|
-| Создать все файлы пустыми | Не bootstrap, а скелет | Заполнить из templates с подстановкой переменных |
-| Не зафиксировать ai-rules SHA | Project не знает на какую версию правил рассчитан | Обязательный `git rev-parse --short HEAD` |
+| Создать `CLAUDE.md` + `AGENTS.md` по умолчанию | Конфликт с global-only policy. Drift между global и local. Скрытые forks правил | Default — только `artifacts/project-state.md` |
+| Создать локальный `memory-bank/` без явного override запроса | Тот же drift риск | Только когда пользователь явно сказал «нужны project-specific rules» |
+| Угадать что пользователь хочет override | Скрытое решение, не зафиксированное в Lineage | Спросить явно или применить default |
+| Не зафиксировать ai-rules SHA | Project не знает на какую версию правил рассчитан | Обязательный `git rev-parse --short HEAD` в Lineage / project-state |
 | Не создать первую Lineage entry | Pipeline-control не увидит откуда продолжить | Entry «Project bootstrapped» обязательна |
-| Скопировать `memory-bank/` локально в новый проект | Дубль, drift | `RULES_ROOT/memory-bank/` остаётся source of truth, project ссылается |
 | Не сказать пользователю next step | Зависает между skills | Явный handoff: «Активируй product-brief» |
-| Заполнить `[TBD]` для всех полей | Не bootstrap, а пустой template | Заполнить что известно, `[TBD]` только для реально неизвестных |
+| Override mode без явной фразы пользователя в Lineage | Не понятно почему override | Зафиксировать точную фразу в provenance |
 
 ## Outcome
 
-- 3 файла созданы (`CLAUDE.md`, `AGENTS.md`, `artifacts/project-state.md`)
-- Все известные поля заполнены, неизвестные — `[TBD]`
-- ai-rules SHA зафиксирован
-- Первая Lineage entry в project-state.md
+### Default mode
+- 1 файл создан: `artifacts/project-state.md`
+- ai-rules SHA зафиксирован в project-state
+- Первая Lineage entry — `Project bootstrapped (default global-only mode)`
 - Пользователю дана команда на next step (обычно `product-brief`)
+
+### Override mode (only on explicit request)
+- 3 файла созданы: `CLAUDE.md`, `AGENTS.md`, `artifacts/project-state.md`
+- ai-rules SHA зафиксирован
+- Lineage entry содержит **точную фразу пользователя** в provenance
+- Acknowledge включает warning что local override активен

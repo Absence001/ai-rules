@@ -78,7 +78,7 @@ data_access_level: raw
 | Старт проекта (пусто) | `product-brief` |
 | После brief.md | `srgid-research` |
 | После research.md | `ia-design` |
-| После ia.md | `design-system` (если новая DS) или `screens-from-screenshot` |
+| После ia.md | `design-system` (если новая DS) или `screenshot-to-code` (если есть референс) |
 | Mobile target | `mobile-design` |
 | После screens.md | `frontend-impl` (если код) |
 | Polish | `craft-audit` |

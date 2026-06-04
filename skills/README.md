@@ -1,6 +1,6 @@
 # Skills
 
-Skills — **Claude-only** обёртки над memory-bank. Caudex CLI продолжает читать `AGENTS.md` + `codex/AGENTS.md` напрямую.
+Skills — **Claude-only** обёртки над memory-bank. Codex CLI продолжает читать `AGENTS.md` + `codex/AGENTS.md` напрямую.
 
 ## Что это
 

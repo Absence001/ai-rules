@@ -79,15 +79,27 @@ ai-rules/
 
 После каждого обновления правил — запусти `sync-rules.bat`.
 
-### Новый проект
+### Новый проект (default — global-only)
 
 Для каждого нового проекта:
 
 1. Создать папку проекта
-2. При необходимости создать `<project>/artifacts/project-state.md` из `templates/project-state.md`
-3. Заполнить project-specific поля (имя, тип, стек, Figma link, ai-rules commit)
+2. Создать `<project>/artifacts/project-state.md` из `templates/project-state.md` (Material Passport)
+3. Заполнить project-specific поля (имя, тип, стек, Figma link, ai-rules commit SHA)
 4. Глобальные правила грузятся автоматически через `~/.claude/CLAUDE.md` и `~/.codex/AGENTS.md`
-5. Не копировать в проект `AGENTS.md`, `CLAUDE.md` и `memory-bank/`, если не нужен осознанный локальный override
+5. **Не копировать** в проект `AGENTS.md`, `CLAUDE.md`, `memory-bank/` — это default policy
+
+Skill `project-init` делает шаги 2-3 автоматически (см. `skills/project-init/SKILL.md`).
+
+### Local override (только conscious decision)
+
+Если **нужны project-specific правила** отличные от global:
+
+1. Скопировать `templates/CLAUDE.md` → `<project>/CLAUDE.md` (override для Claude)
+2. Скопировать `templates/AGENTS.md` → `<project>/AGENTS.md` (override для Codex)
+3. Опционально создать `<project>/memory-bank/<category>/<file>.md` для project-specific knowledge
+
+⚠️ Local override **fork**ит правила: изменения в `RULES_ROOT` не подхватятся автоматически. Использовать **только** когда global rules реально недостаточны.
 
 ## Обновление правил
 

@@ -30,13 +30,14 @@
 
 Подробности — в `memory-bank/design-system/figma-code-parity.md`.
 
-## Skills (когда применимо)
+## Skills (активны, грузятся из `~/.claude/skills/`)
 
-Когда задача чётко относится к одному из доменов — используй Skill tool для точечной загрузки:
+Skills синхронизируются из `RULES_ROOT/skills/` через `sync-rules.bat`. Активируются автоматически по `trigger_keywords` + `intent` description. Если match неясен — спросить пользователя, не угадывать.
 
 | Триггер | Skill |
 |---|---|
-| Brief / kickoff | `product-brief` |
+| Новый проект, kickoff | `project-init` |
+| Brief / kickoff (после init) | `product-brief` |
 | Research / SRGID | `srgid-research` |
 | IA / sitemap / flow | `ia-design` |
 | Design system / tokens | `design-system` |
@@ -45,8 +46,9 @@
 | Screenshot → код | `screenshot-to-code` |
 | Frontend / React | `frontend-impl` |
 | Баг / диагностика | `code-diagnostics` |
+| Meta: где мы / что дальше | `pipeline-control` |
 
-> Skills как Claude-native механизм — будут реализованы отдельно. Пока — используй прямой routing из `AGENTS.md`.
+Direct routing из `AGENTS.md` / `rules-index.md` — fallback если skill недоступен или match неясен.
 
 ## Agentic patterns (для сложных задач)
 

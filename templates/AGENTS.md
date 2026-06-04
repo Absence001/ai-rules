@@ -1,6 +1,12 @@
-# Project AGENTS.md (template для Codex CLI)
+# Project AGENTS.md (template для Codex CLI) — **LOCAL OVERRIDE template**
 
-> Шаблон. Замени `[PROJECT_NAME]` и `[YYYY-MM-DD]`. Для нового проекта — копировать в корень.
+> ⚠️ **Не копировать по умолчанию.** Default policy в `RULES_ROOT/AGENTS.md`: global-only, локальный AGENTS.md в проекте **не нужен**.
+>
+> Этот шаблон используется **только** когда нужен **conscious local override** правил Codex для конкретного проекта.
+>
+> См. `RULES_ROOT/skills/project-init/SKILL.md` — секция «Local override mode».
+>
+> Шаблон. Замени `[PROJECT_NAME]` и `[YYYY-MM-DD]`.
 
 ## Проект
 
