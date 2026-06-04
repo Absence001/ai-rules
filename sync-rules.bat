@@ -86,5 +86,10 @@ if %errorlevel%==0 (
 
 echo.
 echo Done.
-pause
+
+REM Env-gated pause: skip when called from CI/agent/script
+REM Set SYNC_RULES_NO_PAUSE=1 to skip the pause prompt.
+REM Examples (PowerShell): $env:SYNC_RULES_NO_PAUSE=1; .\sync-rules.bat
+REM Examples (cmd):        set SYNC_RULES_NO_PAUSE=1 && sync-rules.bat
+if not defined SYNC_RULES_NO_PAUSE pause
 endlocal

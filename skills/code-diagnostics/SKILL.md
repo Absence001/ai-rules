@@ -66,7 +66,9 @@ data_access_level: raw
    - `RULES_ROOT/memory-bank/meta/calibration.md` — формат уверенности
    - При frontend — `RULES_ROOT/memory-bank/platforms/frontend-implementation-rules.md`
 
-## Обязательный формат ответа
+## Обязательный формат ответа (зависит от режима)
+
+### Diagnosis mode
 
 ```
 - ПРОБЛЕМА: …
@@ -78,18 +80,33 @@ data_access_level: raw
 - ВОПРОС: Могу ли я начать исправление?
 ```
 
-**Никогда не править код без подтверждения** ВОПРОСА. Это calibration по Lilian Weng + stage gate.
+**В diagnosis mode** код не менять до явного «да» от пользователя.
 
-## Протокол
+### Direct fix mode
+
+```
+- ПРОБЛЕМА: …
+- ИЗМЕНЁННЫЕ ФАЙЛЫ: …
+- ЧТО СДЕЛАНО (минимальный fix): …
+- КАК ПРОТЕСТИРОВАНО: …
+- УВЕРЕННОСТЬ: X% (актуально для bug-fix решений)
+- ОСТАТОЧНЫЙ РИСК: что может ещё всплыть / что я не покрыл
+```
+
+**В direct fix mode** финальный `ВОПРОС` не нужен — пользователь явно попросил fix. Но **остановиться и спросить**, если в процессе обнаружено что fix требует high-risk action (deps, deletion, scope/architecture, DS change, Figma write — см. `AGENTS.md` Stage gates).
+
+## Протокол (применим в обоих режимах)
 
 1. **Сначала найти проблему** в коде / конфиге / логах. До этого — никаких правок.
 2. **Проверить гипотезу 3 раза:**
    - Код (сам исходник)
    - Конфиг (package.json, tsconfig, env)
    - Логи / симптомы (runtime errors, network, console)
-3. Если 3-кратная проверка не сходится — задать вопрос, не править.
+3. Если 3-кратная проверка не сходится — задать вопрос, не править (даже в direct fix mode).
 4. После правки — **минимальные изменения**. Не рефакторить попутно.
 5. Отчёт: что / почему / какие файлы / как проверить.
+
+**Direct fix mode не даёт право игнорировать root cause analysis** — он только убирает финальный confirmation step.
 
 ## ReAct + Reflexion (Lilian Weng)
 
@@ -117,12 +134,14 @@ data_access_level: raw
 
 | Pattern (WRONG) | Why it fails | Correct (RIGHT) |
 |---|---|---|
-| Сразу предложить fix не разобравшись | Лечим симптом, причина остаётся | Diagnose → propose → подтверждение |
+| Сразу предложить fix не разобравшись | Лечим симптом, причина остаётся | Diagnose → propose → (diagnosis) confirm OR (direct fix) execute |
 | Заявить «уверен на 100%» когда не уверен | Sycophancy / overconfidence | Честный % уверенности |
 | Слепой retry после провала | Трата токенов | Reflexion: что не сработало → новая стратегия |
 | Большие изменения с рефакторингом «попутно» | Risk + drift | Минимальные изменения только под bug |
-| Править код без явного «можно» | Stage gate нарушен | Question → wait → fix |
-| Игнорировать calibration формат | Lose discipline | Полный шаблон каждый раз |
+| **В diagnosis mode:** править код без явного «да» | Stage gate нарушен | Question → wait → fix |
+| **В direct fix mode:** игнорировать high-risk gate (поставить пакет / удалить файл / поменять архитектуру) | High-risk gate всегда обязательный | Остановиться → спросить пользователя |
+| Не определиться с режимом перед действием | Внутренний конфликт скилла | Initial Response спрашивает режим если не явный |
+| Игнорировать calibration формат | Lose discipline | Полный шаблон каждый раз (mode-specific) |
 
 ## Outcome
 

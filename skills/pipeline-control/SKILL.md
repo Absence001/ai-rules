@@ -100,15 +100,19 @@ Brief → SRGID → Research → IA → DS → Screens → Prototype → Craft
 
 ## Decision Lineage protocol
 
-После значимого решения — **обязательно** запись в `project-state.md` раздел 4:
+После значимого решения — **обязательно** запись в `project-state.md` раздел 4. **7 колонок** (включая `Next action` — baton для следующей сессии):
 
 ```markdown
-| # | Дата | Решение | Кем | Provenance | Artifact |
-|---|---|---|---|---|---|
-| 5 | 2026-06-04 | Используем 3-tier tokens | Claude | RULES_ROOT/memory-bank/design-system/design-system-core.md | artifacts/design-system.md |
+| # | Дата | Решение | Кем | Почему (provenance) | Artifact | Next action |
+|---|---|---|---|---|---|---|
+| 5 | 2026-06-04 | Используем 3-tier tokens | Claude | RULES_ROOT/memory-bank/design-system/design-system-core.md | artifacts/design-system.md | Завести primitive/semantic слои в Figma Variables |
 ```
 
-**Append-only.** Override через новую запись «Override #N: ...».
+**Правила:**
+- **Append-only.** Override через новую запись «Override #N: ...».
+- `Provenance` обязательно — ссылка на artifact / rule / явный запрос пользователя.
+- `Next action` — конкретное действие для следующей сессии (паттерн baton из jezweb/design-loop). Без него resumption деградирует.
+- Если решение отброшено позже — добавь запись в раздел `4a. What Didn't Work` с конкретной причиной.
 
 ## Reset boundary
 
