@@ -1,0 +1,13 @@
+# Windows batch / cmd files require CRLF for cmd.exe to execute correctly.
+# Force CRLF regardless of platform.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# PowerShell — prefer CRLF on Windows but tolerant
+*.ps1 text eol=crlf
+
+# Shell scripts — LF (run on Unix-like)
+*.sh text eol=lf
+
+# Default: let git auto-detect text, normalize to LF in repo, native on checkout
+* text=auto

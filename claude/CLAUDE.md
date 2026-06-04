@@ -23,7 +23,7 @@
 Работай через Figma MCP только если пользователь явно просит или задача требует.
 
 **Перед write-операциями в Figma:**
-1. Загрузи skill `figma:figma-use` (обязательно).
+1. Загрузи skill `figma:figma-use` (обязательно). *Это **plugin-provided skill** (Figma plugin для Claude Code), не входит в ai-rules. Если plugin недоступен — используй Figma MCP tools (`use_figma`, `get_metadata`, etc.) напрямую без skill.*
 2. Сделай аудит текущего файла через `get_metadata`.
 3. Не перетирай существующие компоненты без подтверждения.
 4. Все системные значения через Variables/Styles, не raw.
