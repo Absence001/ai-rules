@@ -63,6 +63,21 @@ if exist "%CLAUDE_HOME%\CLAUDE.md" (
     echo [WARN] %CLAUDE_HOME%\CLAUDE.md doesn't exist
 )
 
+REM ============================================================
+REM Claude Skills: copy ai-rules/skills/ to ~/.claude/skills/
+REM ============================================================
+echo.
+echo --- Claude Skills sync ---
+
+if not exist "%CLAUDE_HOME%\skills" mkdir "%CLAUDE_HOME%\skills"
+xcopy /E /Y /I /Q "%RULES_ROOT%\skills" "%CLAUDE_HOME%\skills" >nul
+
+if %errorlevel%==0 (
+    echo [OK] %CLAUDE_HOME%\skills synced ^(10 skills^)
+) else (
+    echo [ERROR] Failed to sync Skills
+)
+
 echo.
 echo Done.
 pause
