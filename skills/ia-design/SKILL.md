@@ -17,6 +17,20 @@ data_access_level: raw
 
 Информационная архитектура и user flows. **Сначала структура → потом визуал** (Samsonov).
 
+## Initial Response (обязательно при первом вызове)
+
+При активации без конкретного контекста — сразу ответить:
+
+> «Активирован ia-design. Перед IA — проверка:
+> 1. **`research.md` есть?** Без research IA = ставка вслепую. Если нет — сначала `srgid-research`.
+> 2. **Pre-flight check (3 вопроса Samsonov):**
+>    - Какие у нас assumptions?
+>    - Как мы узнаем что мы неправы?
+>    - Что сделаем если неправы?
+> 3. **Four Big Risks (Cagan):** какой риск открыт — value / usability / feasibility / viability?
+>
+> После — построю sitemap (макс. 2 уровня), main user flow, и decision table Modal/Drawer/Screen/Wizard для ключевых действий. Mandatory states (empty / loading / error) — обязательны.»
+
 ## Когда триггерится
 
 - Запрос на sitemap / IA / навигацию / flow

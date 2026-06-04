@@ -18,6 +18,21 @@ data_access_level: raw
 
 Мета-skill. Управляет переходами между этапами.
 
+## Initial Response (обязательно при первом вызове)
+
+При активации без конкретного вопроса — сразу:
+
+> «Активирован pipeline-control. Сначала ориентируюсь по проекту:
+>
+> 1. **Читаю `./artifacts/project-state.md`** (если есть) — где остановились, текущий этап, последняя Decision Lineage entry.
+> 2. Если `project-state.md` нет — это **bootstrap**. Запущу `project-init` skill.
+> 3. **Pipeline status:**
+>    - Какой этап завершён? (есть ли `brief.md` / `srgid.md` / `research.md` / `ia.md` / `design-system.md` / `screens.md` / `prototype.md` / `craft-audit.md`)
+>    - Где мы сейчас?
+>    - Какой следующий skill активировать (по Skill routing table ниже)?
+>
+> Stage gates: нельзя пропускать. Если xотим override — фиксирую в Lineage как `assumption: user override`.»
+
 ## Когда триггерится
 
 - Старт новой сессии в существующем проекте (orient via project-state)

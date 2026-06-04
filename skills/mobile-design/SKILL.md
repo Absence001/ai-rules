@@ -17,6 +17,21 @@ data_access_level: raw
 
 Платформо-aware дизайн для mobile. Платформа решается **первой** — iOS, Android, cross-platform.
 
+## Initial Response (обязательно при первом вызове)
+
+При активации без конкретного контекста — сразу ответить:
+
+> «Активирован mobile-design. Прежде всего — **платформа**:
+> 1. **iOS, Android или cross-platform?** Источник истины — HIG / Material 3 / оба.
+> 2. **Тип задачи:** native app / mobile web / cross-platform (React Native / Flutter)?
+> 3. **Что делаем:** новый экран / навигация / patterns review / accessibility audit?
+>
+> Hard rules:
+> - **Touch targets:** iOS ≥44pt, Android ≥48dp.
+> - **Не переносить web-паттерны** (hover-only UX = fail на touch).
+> - **Safe areas** и системная навигация (iOS swipe back sacred).
+> - **Native pickers** > custom dropdowns.»
+
 ## Когда триггерится
 
 - Target platform mobile (любая)

@@ -6,11 +6,12 @@ Skills — **Claude-only** обёртки над memory-bank. Caudex CLI про�
 
 Skill — модульное знание, которое Claude грузит **по требованию** (через description + intent matching), а не сразу всё в контекст. См. `RULES_ROOT/AGENTS.md` и Anthropic Skills docs.
 
-## 10 skills
+## 11 skills
 
 | Skill | Когда триггерится | Указывает на (memory-bank/) |
 |---|---|---|
-| `product-brief` | Новый проект, расплывчатый запрос | `discovery/brief-expander.md` |
+| `project-init` | Пустая папка, «новый проект», bootstrap | `templates/*` |
+| `product-brief` | Новый проект (после init), расплывчатый запрос | `discovery/brief-expander.md` |
 | `srgid-research` | Research, конкуренты, SRGID | `discovery/srgid-*.md`, `sources-trust.md` |
 | `ia-design` | IA, sitemap, flow | `ia-flow/*.md` |
 | `design-system` | Tokens, components, variants, theming | `design-system/*.md` |

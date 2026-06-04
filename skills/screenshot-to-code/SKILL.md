@@ -17,6 +17,19 @@ data_access_level: raw
 
 Восстановление UI по скриншоту / референсу.
 
+## Initial Response (обязательно при первом вызове)
+
+При активации без конкретного контекста — сразу ответить:
+
+> «Активирован screenshot-to-code. **Не начинаю код сразу.** Сначала:
+> 1. **Скриншот / референс приложен?** Если нет — попрошу.
+> 2. **Тип скрина:** web landing / app screen / dashboard / mobile / editorial?
+> 3. **Visual register** — какой один основной? (`product-app` / `brand-marketing` / `editorial-minimal` / `mobile-product` / другой)
+> 4. **Стек** — Next.js + Tailwind + shadcn/ui (по умолчанию Lee Robinson) или другой?
+> 5. **Figma MCP** — использовать или явно без MCP?
+>
+> Порядок: анализ → component tree → стек → твоё подтверждение → реализация → visual diff → anti-slop audit.»
+
 ## Когда триггерится
 
 - Пользователь прикрепил скриншот / референс

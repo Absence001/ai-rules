@@ -17,6 +17,24 @@ data_access_level: raw
 
 Реализация в коде. React / Next.js / Tailwind / shadcn/ui (Lee Robinson defaults).
 
+## Initial Response (обязательно при первом вызове)
+
+При активации без конкретного контекста — сразу ответить:
+
+> «Активирован frontend-impl. Перед кодом:
+> 1. **Стек проверен?** Прочитаю `package.json` — какой реально стек (Next / Vite / TS version).
+> 2. **DS есть?** Если `design-system.md` готова — компоненты из неё. Если нет — `design-system` skill сначала.
+> 3. **Screens готовы?** Что именно реализовать.
+> 4. **Зависимости** — что-то нужно установить? Без подтверждения не ставлю.
+>
+> Hard rules:
+> - **RSC top, Client leaf.** Не `'use client'` на root layout.
+> - **No `any`** в TS.
+> - **No raw values** — только tokens / Tailwind с design tokens.
+> - **No `transition: all`**, только `transform`/`opacity` для animations.
+> - **A11y baseline:** `:focus-visible`, semantic HTML, `<label>` обязательно.
+> - **gap** > margin для flex/grid детей.»
+
 ## Когда триггерится
 
 - Запрос «закодируй это», «implement», «build the component»

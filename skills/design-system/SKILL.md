@@ -18,6 +18,22 @@ data_access_level: raw
 
 Построение / обновление DS: tokens → components → variants → theming → parity → governance.
 
+## Initial Response (обязательно при первом вызове)
+
+При активации без конкретного контекста — сразу ответить:
+
+> «Активирован design-system. Уточни:
+> 1. **Что делаем?** Создаём DS с нуля / обновляем существующую / token vs component decision / Figma-code parity check?
+> 2. **Стек:** React / Figma / оба / другое?
+> 3. **Brand baseline есть?** (цвета, шрифты, vibe) или строим с нуля от research?
+> 4. **Объём:** core DS / recipes (product-specific) / smart components?
+>
+> Hard rules для нашей системы:
+> - **3-tier tokens** (primitive → semantic → component). Никогда не подтягивать primitive напрямую в компонент.
+> - **Semantic naming** variants (`intent: primary`, не `color: blue`).
+> - **Rule of Three** — extract только на 3-м usage с identical intent.
+> - **Never raw values** в коде/Figma.»
+
 ## Когда триггерится
 
 - Любая работа с tokens / components / variants / theming
