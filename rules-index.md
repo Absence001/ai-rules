@@ -2,7 +2,7 @@
 
 **Цель:** короткий маршрутизатор для token economy. Грузи только то что нужно для типа задачи.
 
-`RULES_ROOT = C:/Users/PC/ai-rules` (см. `AGENTS.md`).
+`RULES_ROOT = ~/ai-rules` (см. `AGENTS.md`).
 
 Все пути — относительно `RULES_ROOT/memory-bank/`.
 

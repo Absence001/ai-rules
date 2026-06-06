@@ -47,15 +47,15 @@ echo.
 echo --- Claude check ---
 
 if exist "%CLAUDE_HOME%\CLAUDE.md" (
-    findstr /C:"@C:/Users/PC/ai-rules/AGENTS.md" "%CLAUDE_HOME%\CLAUDE.md" >nul
+    findstr /C:"/ai-rules/AGENTS.md" "%CLAUDE_HOME%\CLAUDE.md" >nul
     if errorlevel 1 (
         echo [WARN] %CLAUDE_HOME%\CLAUDE.md doesn't import AGENTS.md
-        echo Add: @C:/Users/PC/ai-rules/AGENTS.md
+        echo Add: /ai-rules/AGENTS.md
     ) else (
-        findstr /C:"@C:/Users/PC/ai-rules/claude/CLAUDE.md" "%CLAUDE_HOME%\CLAUDE.md" >nul
+        findstr /C:"/ai-rules/claude/CLAUDE.md" "%CLAUDE_HOME%\CLAUDE.md" >nul
         if errorlevel 1 (
             echo [WARN] %CLAUDE_HOME%\CLAUDE.md doesn't import claude/CLAUDE.md
-            echo Add: @C:/Users/PC/ai-rules/claude/CLAUDE.md
+            echo Add: /ai-rules/claude/CLAUDE.md
         ) else (
             echo [OK] %CLAUDE_HOME%\CLAUDE.md imports both AGENTS.md and claude/CLAUDE.md
         )

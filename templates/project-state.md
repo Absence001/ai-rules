@@ -16,7 +16,7 @@ schema_version: 1
 - **Тип:** [лендинг / mobile app / SaaS / DS / другое]
 - **Стек:** [React, Next.js, Tailwind, etc.]
 - **Figma файл:** [ссылка если есть]
-- **ai-rules commit:** `[SHA из C:/Users/PC/ai-rules]`
+- **ai-rules commit:** `[SHA из ~/ai-rules]`
 - **Создан:** `[YYYY-MM-DD]`
 
 ## 2. Цель (outcome)

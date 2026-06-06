@@ -30,4 +30,4 @@ Project-specific артефакты (brief, srgid, research, ia, design-system, 
 ## Источник правды
 
 - **GitHub** ([github.com/Absence001/ai-rules](https://github.com/Absence001/ai-rules)) — source of truth для правил
-- **Локальный clone** (`C:/Users/PC/ai-rules`) — runtime cache. Изменения коммитить и пушить
+- **Локальный clone** (`~/ai-rules`) — runtime cache. Изменения коммитить и пушить

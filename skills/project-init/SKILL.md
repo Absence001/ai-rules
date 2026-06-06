@@ -24,7 +24,7 @@ Bootstrap нового проекта из шаблонов ai-rules. **Default 
 
 > «Активирован project-init. Bootstrap нового проекта из ai-rules.
 >
-> **По умолчанию (global-only):** создам только `./artifacts/project-state.md`. Глобальные правила (`AGENTS.md`, `CLAUDE.md`, `memory-bank/`) живут в `RULES_ROOT = C:/Users/PC/ai-rules` и грузятся автоматически через `~/.claude/CLAUDE.md` и `~/.codex/AGENTS.md` — копировать их в проект не нужно.
+> **По умолчанию (global-only):** создам только `./artifacts/project-state.md`. Глобальные правила (`AGENTS.md`, `CLAUDE.md`, `memory-bank/`) живут в `RULES_ROOT = ~/ai-rules` и грузятся автоматически через `~/.claude/CLAUDE.md` и `~/.codex/AGENTS.md` — копировать их в проект не нужно.
 >
 > Мне нужно знать:
 > 1. **Имя проекта**
@@ -80,7 +80,7 @@ Bootstrap нового проекта из шаблонов ai-rules. **Default 
 > «Готово. Структура создана:
 > - `<project>/artifacts/project-state.md`
 >
-> Глобальные правила грузятся автоматически из `RULES_ROOT = C:/Users/PC/ai-rules` (`AGENTS.md` + `claude/CLAUDE.md` + `codex/AGENTS.md` + `memory-bank/`). Текущий ai-rules commit: `<SHA>`.
+> Глобальные правила грузятся автоматически из `RULES_ROOT = ~/ai-rules` (`AGENTS.md` + `claude/CLAUDE.md` + `codex/AGENTS.md` + `memory-bank/`). Текущий ai-rules commit: `<SHA>`.
 >
 > **Next step:** активируй `product-brief` skill — соберём бриф (4-6 вопросов одним раундом).»
 

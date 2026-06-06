@@ -5,8 +5,10 @@
 ## RULES_ROOT (где лежат правила)
 
 ```
-RULES_ROOT = C:/Users/PC/ai-rules
+RULES_ROOT = ~/ai-rules
 ```
+
+`~/ai-rules` = папка `ai-rules` в домашней директории текущего пользователя; разрешается per-machine (Windows: `%USERPROFILE%\ai-rules`, напр. `C:/Users/sfxy3/ai-rules`; Unix: `$HOME/ai-rules`). Не хардкодить абсолютный путь конкретного юзера.
 
 **Все routing-пути** в этом файле и в `claude/CLAUDE.md` / `codex/AGENTS.md` разрешаются относительно `RULES_ROOT`.
 

@@ -5,13 +5,13 @@
 ## Источник правды
 
 - **GitHub** ([github.com/Absence001/ai-rules](https://github.com/Absence001/ai-rules)) — **source of truth**.
-- **Локальный clone** (`C:/Users/PC/ai-rules`) — runtime cache. Изменения здесь нужно коммитить и пушить.
+- **Локальный clone** (`~/ai-rules`) — runtime cache. Изменения здесь нужно коммитить и пушить.
 - При расхождении — GitHub приоритет, локально делаем `git pull`.
 
 ## Bootstrap
 
 ```
-RULES_ROOT = C:/Users/PC/ai-rules
+RULES_ROOT = ~/ai-rules
 ```
 
 Все routing-пути в правилах разрешаются относительно `RULES_ROOT`.
@@ -69,8 +69,8 @@ ai-rules/
 Файл `~/.claude/CLAUDE.md` загружается для любого проекта автоматически:
 
 ```markdown
-@C:/Users/PC/ai-rules/AGENTS.md
-@C:/Users/PC/ai-rules/claude/CLAUDE.md
+@~/ai-rules/AGENTS.md
+@~/ai-rules/claude/CLAUDE.md
 ```
 
 ### Codex CLI (глобально)
@@ -104,7 +104,7 @@ Skill `project-init` делает шаги 2-3 автоматически (см.
 ## Обновление правил
 
 ```bash
-cd C:/Users/PC/ai-rules
+cd ~/ai-rules
 # редактируй файлы
 git add .
 git commit -m "update: описание изменения"

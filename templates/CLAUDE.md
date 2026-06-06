@@ -15,12 +15,12 @@
 - **Стек:** [React, Next.js, Tailwind, shadcn/ui — заполни]
 - **Figma файл:** [ссылка если есть]
 - **Создан:** `[YYYY-MM-DD]`
-- **ai-rules commit:** `[short SHA из C:/Users/PC/ai-rules — git rev-parse --short HEAD]`
+- **ai-rules commit:** `[short SHA из ~/ai-rules — git rev-parse --short HEAD]`
 
 ## RULES_ROOT
 
 ```
-RULES_ROOT = C:/Users/PC/ai-rules
+RULES_ROOT = ~/ai-rules
 ```
 
 Глобальные правила: `RULES_ROOT/AGENTS.md` + `RULES_ROOT/claude/CLAUDE.md` (грузятся автоматически из `~/.claude/CLAUDE.md`).
