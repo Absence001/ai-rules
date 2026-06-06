@@ -3,9 +3,9 @@ setlocal enabledelayedexpansion
 chcp 65001 >nul
 echo Syncing ai-rules globally...
 
-set RULES_ROOT=C:\Users\PC\ai-rules
-set CODEX_HOME=C:\Users\PC\.codex
-set CLAUDE_HOME=C:\Users\PC\.claude
+set RULES_ROOT=%USERPROFILE%\ai-rules
+set CODEX_HOME=%USERPROFILE%\.codex
+set CLAUDE_HOME=%USERPROFILE%\.claude
 
 REM ============================================================
 REM Codex: ~/.codex/AGENTS.md = AGENTS.md + codex/AGENTS.md + bootstrap
