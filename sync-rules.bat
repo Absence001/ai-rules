@@ -84,6 +84,25 @@ if %errorlevel%==0 (
     echo [ERROR] Failed to sync Skills
 )
 
+REM ============================================================
+REM Rules lint: проверка целостности правил после синка (drift/refs/secrets)
+REM Модель правил — Ctxlint/agnix/compass. Подробности — RULES-GOVERNANCE.md
+REM ============================================================
+echo.
+echo --- Rules lint ---
+
+where node >nul 2>nul
+if errorlevel 1 (
+    echo [WARN] node не найден — пропускаю rules-lint
+) else (
+    node "%RULES_ROOT%\scripts\rules-lint.mjs"
+    if errorlevel 1 (
+        echo [ERROR] rules-lint нашёл ошибки — правила рассинхронизированы, см. вывод выше
+    ) else (
+        echo [OK] rules-lint: правила целостны
+    )
+)
+
 echo.
 echo Done.
 
