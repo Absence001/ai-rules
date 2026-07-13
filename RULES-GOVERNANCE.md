@@ -64,8 +64,9 @@ Node-скрипт без зависимостей (boring tech; node, не pytho
 **Решение:** `scripts/guard-hook.mjs` — детерминированный PreToolUse-блок всегда-запрещённых команд
 (`rm -rf /`, `rm -rf ~`, `git reset --hard`, force-push без lease, `commit --no-verify`, `commit --amend`,
 `mkfs`, `dd of=/dev/*`, fork-бомба, рекурсивный chmod/chown на системных путях, обход GPG). Модель Safety Guard.
-**Wiring:** по решению пользователя — только в `.claude/settings.local.json` репо ai-rules (пилот), НЕ глобально.
-Глобально (`~/.claude/settings.json`) и другие проекты (напр. praid-ecom) пока не покрыты.
+**Wiring:** по решению пользователя вынесен ГЛОБАЛЬНО в `~/.claude/settings.json` (PreToolUse, matcher Bash) —
+покрывает все проекты на машине. Локальный дубль из `.claude/settings.local.json` убран (иначе двойной прогон).
+Обе settings-локации gitignored/per-machine — в репо уезжает только сам скрипт `scripts/guard-hook.mjs`.
 **Проверено:** 6/6 опасных команд блокируются, 7/7 рабочих (`rm -rf ./build`, `--force-with-lease`,
 `git commit -m`, `reset --soft`, `corepack pnpm`) проходят — ложных срабатываний нет.
 **Важно:** хук активируется при **перезапуске сессии** Claude Code (хуки читаются на старте).
