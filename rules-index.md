@@ -48,6 +48,8 @@
 | **Frontend / React код** | код, React, Next.js, frontend | Discussion shifts к props / hooks / RSC / Tailwind classes / files | `platforms/frontend-implementation-rules.md`, `craft/motion-rules.md`. При DS-привязке — `design-system/tokens-spec.md` | `design-system.md`, `screens.md` | research, IA, mobile (если web) |
 | **Screenshot → код** | скрин, screenshot, image-to-code | Прикреплён скриншот / референс, «сделай как тут» | `screenshot-to-code/image-to-code-workflow.md`, `craft/visual-registers.md`, `platforms/frontend-implementation-rules.md`, `craft/anti-slop-audit.md` | — | research, IA, mobile-platform |
 | **Craft audit / polish** | polish, audit, craft, anti-slop | UI «как AI-сгенерированный», «доведи до идеала», visual review | `craft/craft-core.md`, `visual-registers.md`, `anti-slop-audit.md`, `motion-rules.md` | `screens.md`, `craft-audit.md` | research, IA |
+| **Деталь вёрстки** | радиус, тени, оптическое выравнивание, tabular numbers, хит-зона | Одна конкретная деталь, а не экран целиком | скилл `make-interfaces-feel-better` | — | research, IA |
+| **Движение / анимация** | анимация, motion, transition, easing, «дёргается» | Построить, отревьюить, ускорить или найти место для движения | скиллы Эмиля: `animate`, `review-animations`, `improve-animations`, `animation-performance`, `emil-design-eng`. Базовые правила проекта — `craft/motion-rules.md` (приоритетнее при конфликте) | `design-system.md` | research, IA |
 | **Design handoff** | handoff, specs, передача в dev | Готовый дизайн → готовится к передаче, specs / redlines / dev review | `pd-workflows/design-handoff.md`, `design-system/component-anatomy.md`, `pd-workflows/component-documentation.md` | `design-system.md`, `screens.md` | research, IA |
 | **Design critique / review** | critique, review, feedback | Запрос оценки дизайн-решения, design review session | `pd-workflows/design-critique.md` | `screens.md` или конкретный артефакт | implementation |
 | **Microcopy / content** | тексты, метки, copy | Обсуждение слов в UI, labels, error messages, CTA | `pd-workflows/microcopy.md`, `ia-flow/ia-rules.md` (labels = words) | `ia.md`, `screens.md` | DS-governance, code |
@@ -77,6 +79,7 @@
 | Случай | Действие |
 |---|---|
 | Задача затрагивает 2+ типов | Читай файлы из обеих категорий, но **минимум общих** |
+| Craft / деталь / движение — неясно, что именно | Правило масштаба: экран целиком → `craft-audit`; одна деталь → `make-interfaces-feel-better`; «как надо?» → `emil-design-eng`; конкретная работа с движением → профильный скилл. Полная таблица — `skills/README.md` |
 | Тип неясен | Спроси пользователя «это про X или Y?» — не угадывай |
 | Локальный `memory-bank/` в проекте есть | **Supplement, не replacement.** Используй для project-specific knowledge. Core `AGENTS.md` + tool roles + этот index — **остаются global** |
 | Локальный `artifacts/project-state.md` | **Читать первым**, до любых rules |

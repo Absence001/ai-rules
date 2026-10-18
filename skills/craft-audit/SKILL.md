@@ -1,15 +1,17 @@
 ---
 name: craft-audit
 status: active
-description: Apply craft-level polish, visual register selection, anti-slop audit, motion rules. Use when user requests polish, visual review, redesign quality check, anti-AI-look audit, or when finishing a UI/landing/screen. Includes Refactoring UI rules (no pure #000, hierarchy via multiple signals), Comeau/Kowalski animation rules (transform/opacity only, <300ms), and the full anti-slop checklist.
+description: Этап craft-аудита продуктового пайплайна — выбор визуального регистра и anti-slop-проверка экрана целиком, с артефактом craft-audit.md. Используй когда экран или лендинг доведён до конца и нужен финальный проход по качеству, когда результат «выглядит как AI-сгенерированный», или когда надо выбрать визуальный регистр до отрисовки. Включает правила Refactoring UI (нет чистого #000, иерархия через несколько сигналов) и полный anti-slop-чеклист. НЕ для отдельной детали вёрстки — это make-interfaces-feel-better. НЕ для движения — это animate / review-animations / emil-design-eng.
 trigger_keywords:
-  ru: ["craft", "polish", "polish UI", "audit", "аудит", "анти-слоп", "anti-slop", "доработать", "довести", "критика", "review UI", "visual review"]
-  en: ["craft", "polish", "audit", "anti-slop", "visual review", "review UI", "critique"]
+  ru: ["craft", "craft audit", "крафт", "анти-слоп", "anti-slop", "визуальный регистр", "довести до идеала", "выглядит как AI", "финальная полировка"]
+  en: ["craft", "craft audit", "anti-slop", "visual register", "final polish", "looks AI-generated"]
 intent: |
-  User wants to elevate visual quality, find anti-AI-look patterns, or do final polish pass.
-  Activate also for visual register selection (product-app vs brand-marketing etc.)
+  User finished a screen/landing and wants the pipeline's craft stage: pick the visual register,
+  run the anti-slop checklist across the whole screen, produce artifacts/craft-audit.md.
+  NOT a single implementation detail (radius, optical alignment, tabular numbers).
+  NOT an animation task (building, reviewing or profiling motion).
 task_type: outcome-gradable
-related_skills: [design-system, frontend-impl, mobile-design]
+related_skills: [design-system, frontend-impl, mobile-design, make-interfaces-feel-better, emil-design-eng]
 data_access_level: raw
 ---
 
@@ -30,10 +32,33 @@ data_access_level: raw
 
 ## Когда триггерится
 
-- Любой запрос на polish / audit / critique визуала
+- Финальный проход по качеству готового экрана или лендинга
 - Перед screens / реализацией — выбор visual register
 - После реализации — anti-slop checklist
 - Когда UI «как AI-сгенерированный»
+
+## Когда НЕ я
+
+Я — **этап пайплайна**: смотрю экран целиком и оставляю `artifacts/craft-audit.md`.
+Разовая правка детали и работа с движением — не ко мне:
+
+| Запрос | Кому |
+|---|---|
+| Радиус, оптическое выравнивание, tabular numbers, хит-зона, сглаживание шрифта, тени | `make-interfaces-feel-better` |
+| «Анимировать ли это вообще», выбор кривой и длительности, устройство компонента | `emil-design-eng` |
+| Построить анимацию с нуля | `animate` (веб) / `animate-expo` (React Native) |
+| Ревью существующего движения | `review-animations` |
+| Аудит движения по всей кодовой базе | `improve-animations` |
+| Анимация роняет кадры | `animation-performance` |
+| Веб-приложение ощущается не нативно на телефоне | `mobile-native` |
+
+Если в ходе аудита нашлась проблема из этой таблицы — **назови её в находках
+и передай профильному скиллу**, а не чини сама. Полный разбор — `skills/README.md`.
+
+**Приоритет при конфликте.** Если скилл Эмиля противоречит
+`memory-bank/craft/motion-rules.md` или токенам дизайн-системы проекта — выигрывают
+наши правила: они держат консистентность продукта. Расхождение назови вслух,
+не решай молча (`AGENTS.md` → «Приоритет источников», memory-bank выше внешних практик).
 
 ## Что читать
 

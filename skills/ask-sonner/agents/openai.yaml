@@ -1,0 +1,6 @@
+interface:
+  display_name: "Ask Sonner"
+  short_description: "Библиотека тостов Sonner: подключение и починка"
+  default_prompt: "Use $ask-sonner to set up or troubleshoot Sonner toasts."
+policy:
+  allow_implicit_invocation: true

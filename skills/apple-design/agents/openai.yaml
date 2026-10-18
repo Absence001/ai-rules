@@ -1,0 +1,6 @@
+interface:
+  display_name: "Apple Design"
+  short_description: "Подход Apple к интерфейсу и физике движения для веба"
+  default_prompt: "Use $apple-design to apply Apple interface and motion principles on the web."
+policy:
+  allow_implicit_invocation: true

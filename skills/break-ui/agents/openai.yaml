@@ -1,0 +1,6 @@
+interface:
+  display_name: "Break UI"
+  short_description: "Стресс-тест компонента худшими данными"
+  default_prompt: "Use $break-ui to stress-test a component with worst-case data."
+policy:
+  allow_implicit_invocation: true

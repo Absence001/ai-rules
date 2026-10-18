@@ -1,0 +1,6 @@
+interface:
+  display_name: "Animation Vocabulary"
+  short_description: "Как называется этот эффект движения"
+  default_prompt: "Use $animation-vocabulary to find the exact name of a motion effect."
+policy:
+  allow_implicit_invocation: true
