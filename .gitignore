@@ -1,3 +1,9 @@
 .DS_Store
 Thumbs.db
 *.bak
+
+# temp artifacts
+_tmp_*
+
+# per-machine editor/agent config
+.claude/
