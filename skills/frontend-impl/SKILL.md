@@ -1,7 +1,7 @@
 ---
 name: frontend-impl
 status: active
-description: Implement frontend code (React, Next.js, CSS). Use when user requests code implementation, component build, page assembly, styling, or asks for "how to code this". Enforces modern stack (Lee Robinson defaults — RSC top + Client leaf, no `any`, Tailwind + shadcn/ui), no `transition: all`, transform/opacity-only animations, mandatory accessibility states, and `gap` over margin.
+description: Implement frontend code (React, Next.js, CSS). Use when user requests code implementation, component build, page assembly, styling, or asks for "how to code this". Enforces modern stack (Lee Robinson defaults — RSC top + Client leaf, no `any`, Tailwind + shadcn/ui), no `transition: all`, motion per the design-engineering sources (Emil Kowalski skills, make-interfaces-feel-better), mandatory accessibility states, and `gap` over margin.
 trigger_keywords:
   ru: ["frontend", "фронтенд", "код", "React", "Next.js", "Tailwind", "JSX", "TSX", "компонент в коде", "реализовать", "implement"]
   en: ["frontend", "code", "implement", "React", "Next.js", "Tailwind", "component code", "JSX", "TSX"]
@@ -31,7 +31,7 @@ data_access_level: raw
 > - **RSC top, Client leaf.** Не `'use client'` на root layout.
 > - **No `any`** в TS.
 > - **No raw values** — только tokens / Tailwind с design tokens.
-> - **No `transition: all`**, только `transform`/`opacity` для animations.
+> - **No `transition: all`**; движение — по `memory-bank/craft/motion-rules.md` (первоисточник — скиллы Эмиля).
 > - **A11y baseline:** `:focus-visible`, semantic HTML, `<label>` обязательно.
 > - **gap** > margin для flex/grid детей.»
 
@@ -106,14 +106,19 @@ data_access_level: raw
 - Keyboard navigation работает
 - ARIA roles на интерактивных не-семантических элементах
 
-## Animation rules (Comeau + Kowalski)
+## Animation rules
 
-- **Только `transform` / `opacity`** (НЕ width/height/margin/padding)
-- `transition: all` **запрещён** — explicit properties
-- UI animations **< 300ms**
-- Custom cubic-bezier > built-in CSS easing
-- Hover-вход быстрее hover-выхода (action-driven)
-- `prefers-reduced-motion` обязателен
+Источник — скиллы Эмиля и MIFB; маршрут и шпаргалка — `memory-bank/craft/motion-rules.md`.
+Строишь анимацию — вызывай `animate` (веб) или `animate-expo` (React Native): там
+канонические кривые, длительности и готовые рецепты.
+
+Минимум при реализации:
+- `transition: all` **запрещён** — перечисляй свойства
+- Не анимировать `width`/`height`/`margin`/`padding`; надёжно — `transform`/`opacity`
+- Нет `ease-in` на UI; кастомные кривые вместо встроенных
+- Интерактивное — CSS transitions (прерываются), keyframes — только разовые последовательности
+- Жесты — пружины (`motion`), не CSS
+- Reduced motion — убрать перемещение, оставить opacity и цвет
 
 ## Forms
 
@@ -145,7 +150,7 @@ data_access_level: raw
 | Hardcoded цвет / spacing | Bypass DS | `var(--token)` / token class |
 | `font-weight: 700` | Magic number | `var(--fontWeight-bold)` |
 | Анимировать `width` / `height` | Reflow / jank | `transform` |
-| Symmetric hover (300/300ms) | Robot feel | 125/450ms (action-driven) |
+| `ease-in` на UI | Ощущается медленно | `ease-out` / кастомная кривая (Эмиль) |
 | Bleeding-edge библиотеки | Модель не знает | Boring tech (Lee Robinson + Willison) |
 | Install зависимостей без спроса | Bloat | Спросить пользователя |
 

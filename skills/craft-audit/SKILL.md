@@ -55,10 +55,11 @@ data_access_level: raw
 Если в ходе аудита нашлась проблема из этой таблицы — **назови её в находках
 и передай профильному скиллу**, а не чини сама. Полный разбор — `skills/README.md`.
 
-**Приоритет при конфликте.** Если скилл Эмиля противоречит
-`memory-bank/craft/motion-rules.md` или токенам дизайн-системы проекта — выигрывают
-наши правила: они держат консистентность продукта. Расхождение назови вслух,
-не решай молча (`AGENTS.md` → «Приоритет источников», memory-bank выше внешних практик).
+**Приоритет при конфликте.** Как делать движение и детали — решают первоисточники
+(Эмиль, MIFB, `apple-design`), а не наш memory-bank: наши прежние правила были их
+пересказом и разошлись с оригиналом (`RULES-GOVERNANCE.md` #L7). Выше первоисточников —
+только **токены конкретного проекта**: если в DS есть своя кривая или шкала длительностей,
+используй её. Это не конфликт, а выбор конкретного значения внутри правила.
 
 ## Что читать
 
@@ -86,8 +87,8 @@ data_access_level: raw
 | Before | After | Why | Severity |
 |---|---|---|---|
 | `color: #000000` | `color: hsl(0 0% 8%)` | Pure black жжёт глаза, выглядит как AI default — Refactoring UI | high |
-| `transition: all 300ms` | `transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 200ms ease-out` | `transition: all` ломается при будущих изменениях — Comeau | medium |
-| Hover-вход 300ms, hover-выход 300ms | Hover-вход 125ms, hover-выход 450ms | Симметричный hover ощущается «как робот» — action-driven motion (Comeau / Kowalski) | medium |
+| `transition: all 300ms` | `transition: transform 200ms cubic-bezier(0.23, 1, 0.32, 1), opacity 200ms cubic-bezier(0.23, 1, 0.32, 1)` | `transition: all` ломается при будущих изменениях — Comeau; кривая — Эмиль | medium |
+| Dropdown с `ease-in` | `ease-out`, `cubic-bezier(0.23, 1, 0.32, 1)` | `ease-in` задерживает старт ровно тогда, когда пользователь смотрит — Эмиль | medium |
 ```
 
 ### ❌ WRONG format
@@ -95,7 +96,7 @@ data_access_level: raw
 ```markdown
 - Color: change #000000 to #0a0a0a — better
 - Transition: use specific properties
-- Hover: shorter in, longer out
+- Dropdown: use ease-out
 ```
 
 (Списком — нельзя. Нет Why → нет понимания. Нет Severity → нельзя приоритизировать.)
@@ -135,49 +136,26 @@ data_access_level: raw
 
 **Не смешивать без причины.**
 
-## Decision Trees (Emil Kowalski → adapted)
+## Движение в аудите
 
-### 1. Should this animate at all?
+Кривые, длительности, пружины и hover **здесь не пересказываются** — пересказ
+разошёлся с первоисточником в трёх местах (`RULES-GOVERNANCE.md` #L7). Источник —
+скиллы Эмиля и MIFB, маршрут и шпаргалка — `memory-bank/craft/motion-rules.md`.
+
+Как craft-audit работает с движением:
+1. Отметить в находках, **что** не так с движением на экране, в общем формате таблицы.
+2. Значение для колонки After брать из шпаргалки `motion-rules.md` или из таблиц `animate`.
+3. Если движения на экране много или оно центральное — предложить пользователю
+   `review-animations` (только явный вызов), а не разбирать самой.
+
+### Анимировать ли вообще — по частоте *(Эмиль)*
 
 | Частота действия | Решение |
 |---|---|
 | **100+ раз/день** (keyboard shortcuts, частые клики) | **Никогда не анимировать.** Создаёт ощущение задержки |
 | **10+ раз/день** (toolbar buttons, частые переходы) | Анимация **минимальная** (≤150ms) или убрать |
-| **Несколько раз/день** (модалки, drawers) | Стандартная анимация (200-300ms) |
+| **Несколько раз/день** (модалки, drawers) | Стандартная анимация (модалки и drawer — 200–500ms) |
 | **Редкие моменты** (onboarding, success states) | Полная анимация, можно expressive |
-
-### 2. Animation duration
-
-| Что | Длительность |
-|---|---|
-| Hover / micro-feedback | 100-150ms |
-| Tooltip / popover open | 150-200ms |
-| Modal / sheet open | 250-300ms |
-| Page transition | 300-400ms |
-| Hero animation (один раз) | 400-800ms |
-
-**Hard rule:** UI < 300ms. Свыше — обоснованно (page transitions, hero).
-
-### 3. Easing curve
-
-| Сценарий | Easing |
-|---|---|
-| Element входит на экран | `ease-out` или `cubic-bezier(0.16, 1, 0.3, 1)` (плавно оседает) |
-| Element выходит за экран | `ease-in` (резкий старт, исчезает в направлении движения) |
-| Циклическая (fade in/out) | `ease-in-out` |
-| Spring-like (bounce при нажатии) | `cubic-bezier(0.34, 1.56, 0.64, 1)` (slight overshoot) |
-| Hover state change | `ease` (default достаточно) |
-
-**Built-in CSS easing ≈ скучно.** Custom cubic-bezier выглядит **более энергично** (Emil Kowalski).
-
-### 4. Hover transitions (action-driven)
-
-| Направление | Длительность | Easing |
-|---|---|---|
-| **In (mouse enters)** | 100-150ms | `ease-out` (быстро откликнуться) |
-| **Out (mouse leaves)** | 300-450ms | `ease-out` (плавно вернуться) |
-
-**Анти-pattern:** симметричные 300/300ms — ощущается «как робот» (Comeau).
 
 ## Anti-slop checklist (Refactoring UI + Comeau + Kowalski + Rauno)
 
@@ -191,7 +169,7 @@ data_access_level: raw
 
 ### Color
 
-- [ ] **Чёрный никогда не `#000000`** — `#0a0a0a` или semantic token
+- [ ] **Текст и поверхности — не `#000000`** — `#0a0a0a` или semantic token (прозрачные обводки и тени на чистом чёрном — можно, MIFB)
 - [ ] Иерархия через **несколько сигналов** (размер + вес + цвет + положение)
 - [ ] Серый = вторичная инфа (снижай контраст, не уменьшай размер)
 - [ ] Accent редко и осмысленно
@@ -222,15 +200,17 @@ data_access_level: raw
 
 ### Motion
 
-- [ ] `prefers-reduced-motion` уважён
-- [ ] `transform`/`opacity` only (НЕ `width`/`height`/`top`/`left`)
+Детали и значения — шпаргалка `memory-bank/craft/motion-rules.md`.
+
+- [ ] Reduced motion: перемещение убрано, opacity и цвет оставлены (не «всё выключено»)
+- [ ] Не анимируются `width`/`height`/`top`/`left`/`margin`/`padding`
 - [ ] `transition: all` запрещён
-- [ ] UI animations < 300ms (см. Decision Tree #2)
-- [ ] Custom cubic-bezier > built-in CSS easing (см. Decision Tree #3)
-- [ ] Hover-вход ≠ hover-выход по длительности (action-driven, Comeau — см. Decision Tree #4)
-- [ ] Origin-aware (transform-origin из точки клика)
-- [ ] Не анимировать частые / keyboard actions (см. Decision Tree #1)
-- [ ] Не `scale(0)` — начинать с 0.95
+- [ ] UI до 300ms; модалки и drawer до 500ms
+- [ ] Нет `ease-in` на UI; кастомные кривые вместо встроенных
+- [ ] Частый hover — только смена фона ≤150ms; hover-scale — за `@media (hover: hover)`
+- [ ] Popover растёт из триггера; модалка — по центру
+- [ ] Не анимировать частые / keyboard actions
+- [ ] Не `scale(0)` — начинать с 0.9–0.97 + opacity
 
 ### Shadows
 
@@ -244,7 +224,8 @@ data_access_level: raw
 |---|---|---|
 | `#000000` для текста | Жжёт глаза, AI-look | `#0a0a0a` / semantic token |
 | Дефолтный purple-blue gradient | AI-cliché | Brand colors / restrained accent |
-| Симметричные hover (300/300ms) | Ощущается «как робот» | 125ms in / 450ms out |
+| `ease-in` на UI-элементе | Старт с задержкой — ощущается медленно | `ease-out` / кастомная кривая |
+| Долгий hover на частых элементах | Интерфейс «тормозит» | Смена фона ≤150ms |
 | `transition: all` | Скрытые поломки | Explicit properties |
 | Анимировать `width`/`height` | Reflow / jank | `transform`/`opacity` |
 | Polish ради polish | Декорация без задачи | Visual intent → polish для intent |
@@ -259,7 +240,7 @@ data_access_level: raw
 | # | Issue (WRONG) | Fix (RIGHT) | Why (rule / source) | Severity | Status |
 |---|---|---|---|---|---|
 | 1 | `#000000` в hero text | `hsl(0 0% 8%)` | Refactoring UI: no pure black | high | TODO |
-| 2 | Hover 300/300ms на CTA | Hover 125/450ms | Comeau: action-driven motion | medium | TODO |
+| 2 | Модалка уходит с `ease-in` 400ms | `ease-out` 200ms, выход короче входа | Эмиль: no ease-in on UI; MIFB: exit shorter than enter | medium | TODO |
 | 3 | `transition: all` в 8 местах | Explicit `transform`, `opacity`, `background-color` | Comeau: transition: all forbidden | high | TODO |
 | 4 | Nested cards в pricing | Flat hierarchy, использовать spacing | Refactoring UI: no nested cards | medium | TODO |
 | 5 | Lorem Ipsum в hero | Реальный текст из домена | anti-slop content rule | low | TODO |

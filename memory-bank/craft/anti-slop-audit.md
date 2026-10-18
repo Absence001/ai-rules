@@ -73,13 +73,18 @@ Anti-slop = последний шаг перед production.
 | Anti-pattern | Симптом | Источник |
 |---|---|---|
 | Motion ради motion (анимация на каждый pixel) | Шум | Kowalski |
-| Bounce / elastic без причины | Generic-AI-look | Refactoring UI |
-| Нет `prefers-reduced-motion` | A11y сломана | research |
+| Анимация на частых действиях и клавиатуре | Ощущение задержки | Kowalski |
+| `ease-in` на UI-элементе | Старт с задержкой — ощущается медленно | Kowalski |
+| Bounce / elastic без импульса от жеста | Generic-AI-look | `apple-design` |
+| Нет `prefers-reduced-motion` — или он отключает **всё** | A11y сломана / потеряна понятность | Kowalski, `apple-design` |
 | `transition: all` | Скрытые поломки | Comeau |
-| Симметричные hover (300ms / 300ms) | «Как робот» | Comeau |
-| Animation `width / height` | Тормоза | Comeau / Kowalski |
+| Долгий hover на частых элементах | Интерфейс «тормозит» | MIFB, Kowalski |
+| Hover-scale без `@media (hover: hover)` | Залипает на тач-экранах | Kowalski |
+| Animation `width / height` | Тормоза | `animation-performance` |
 | `scale(0)` старт | Объект телепортируется | Kowalski |
 | 5+ animated elements одновременно | Хаос | Kowalski |
+
+Как делать правильно — `craft/motion-rules.md` → скиллы-первоисточники.
 
 ### Spacing
 
@@ -128,12 +133,13 @@ Anti-slop = последний шаг перед production.
 ## Чек-лист быстрой проверки (под 5 минут)
 
 - [ ] Body text ≥ 16px (web) / ≥ 13pt (iOS) / ≥ 14sp (Android)
-- [ ] Чёрный не `#000000`
+- [ ] Текст и поверхности — не `#000000` (прозрачные обводки и тени — можно)
 - [ ] Grayscale test пройден (иерархия не только через цвет)
 - [ ] Все interactive элементы имеют hover / focus-visible / active
 - [ ] Loading / error / empty states присутствуют где нужно
-- [ ] `prefers-reduced-motion` уважён
-- [ ] Анимации только `transform`/`opacity`, <300ms
+- [ ] Reduced motion: перемещение убрано, opacity и цвет оставлены
+- [ ] Анимируются `transform`/`opacity` (`filter`/`clip-path` — проверено); UI до 300ms, модалки и drawer до 500ms
+- [ ] Нет `ease-in` на UI-элементах
 - [ ] Реалистичный контент (не Lorem / John Doe)
 - [ ] One primary action per screen
 - [ ] Spacing из системы (не произвольные значения)

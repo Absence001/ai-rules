@@ -1,128 +1,82 @@
-# Motion Rules
+# Motion Rules — маршрутизатор
 
-Правила анимаций и движения в UI. Источники: Emil Kowalski, Joshua Comeau, Refactoring UI, Apple HIG, Material 3.
+**Как делать движение — решают первоисточники**, завендоренные в `skills/`:
+скиллы Эмиля Ковальски, `make-interfaces-feel-better` (MIFB) и `apple-design`.
+Этот файл их **не пересказывает**. Он говорит, куда идти, и даёт короткую шпаргалку
+со ссылкой на источник у каждой строки.
 
-## Главный принцип
+> **Почему так.** Прошлая версия файла была пересказом Эмиля и Comeau, сделанным
+> при исследовании, и разошлась с оригиналом: советовала `ease-in` на уход элемента,
+> полное отключение анимаций при reduced motion и медленный hover-выход 450ms.
+> Все три — против первоисточника. См. `RULES-GOVERNANCE.md` #L7.
 
-> *«Knowing when to animate is just one of many things you need to know in order to craft great animations»* — Emil Kowalski
+## Куда идти
 
-Не каждое изменение требует анимации. Чем больше анимаций — тем меньше эффект каждой.
-
-## Hard rules (применять всегда)
-
-1. **Анимируй только `transform` и `opacity`.** Это два свойства которые дёшево анимировать через композитинг.
-2. **Не используй `transition: all`.** Будущие изменения CSS вызовут неожиданные анимации.
-3. **UI-анимации ≤ 300ms.** Спиннеры и переходы быстрее = отзывчивее.
-4. **`prefers-reduced-motion` обязательно.** Уважай системную настройку пользователя:
-   ```css
-   @media (prefers-reduced-motion: reduce) {
-     transition: none;
-   }
-   ```
-5. **Не анимируй `width` / `height`.** Каскад reflow. Используй transform/scale.
-
-## Easing decision tree
-
-| Случай | Easing |
+| Вопрос | Скилл |
 |---|---|
-| Элемент входит на экран | `ease-out` (объект «прилетает и оседает») |
-| Элемент уходит за viewport | `ease-in` (требует осторожности, может быть резко) |
-| Циклическая анимация (loop fade) | `ease-in-out` |
-| Hover state change | `ease` (дефолт работает) |
-| По умолчанию когда не уверен | `ease-out` |
-| Энергичность критична | **Custom cubic-bezier** (built-in CSS недостаточен) |
+| Анимировать ли это вообще, какая кривая, какая длительность | `emil-design-eng` |
+| Построить анимацию с нуля (веб) | `animate` — канонические таблицы кривых и длительностей, `RECIPES.md` |
+| То же в React Native / Expo | `animate-expo` |
+| Жесты, пружины, импульс, прерываемость | `apple-design` |
+| Прерываемость, вход/выход, stagger, иконки | `make-interfaces-feel-better` → `animations.md` |
+| Анимация роняет кадры, `will-change`, что дёшево анимировать | `animation-performance` |
+| Ревью существующего движения | `review-animations` (только явный вызов) |
+| Аудит движения по всей кодовой базе | `improve-animations` |
+| Где стоит добавить движение | `find-animation-opportunities` |
+| Как называется эффект | `animation-vocabulary` |
 
-> *«Custom easing feels more energetic»* — Emil. Для production craft — кастомные кривые работают лучше встроенных.
+## Если первоисточники расходятся между собой
 
-## Action-driven motion
+Расхождения у них — в цифрах и контексте, не в принципах. Бери из скилла, который
+ведёт задачу, и не смешивай цифры из разных:
 
-> Думай об **событиях, а не о состояниях** *(Joshua Comeau)*.
-
-Hover-вход и hover-выход должны иметь **разную длительность**:
-
-```css
-.button {
-  transition: transform 125ms ease-out;  /* быстрый вход */
-}
-.button:not(:hover) {
-  transition-duration: 450ms;  /* медленный выход */
-}
-```
-
-Симметричные transitions (300ms in, 300ms out) ощущаются «как робот».
-
-## Origin-aware анимации
-
-Анимация должна **выходить из логического источника** *(Emil)*. Dropdown открывается из кнопки, а не появляется из центра.
-
-```css
-.dropdown-content {
-  transform-origin: var(--radix-dropdown-menu-content-transform-origin);
-}
-```
-
-Используй CSS-переменные origin (например, Radix UI их предоставляет) или вычисляй вручную.
-
-## Scale-правила
-
-| Правило | Почему |
+| Тема | Кто решает |
 |---|---|
-| **Никогда не анимируй с `scale(0)`** | Объект исчезает мгновенно, выглядит неестественно |
-| **Старт с `scale(0.95)` или `0.9`** | Объект остаётся видимым, движение плавное |
-| **Active state → `scale(0.97)`** | Тактильная обратная связь без bounce |
-| **Не комбинируй `scale(0) + opacity(0)`** | То же что выше — лучше `scale(0.95)` |
+| Кривые, длительности, решение «анимировать ли» | Эмиль (`animate`, `emil-design-eng`) |
+| Детали поверхностей, типографики, иконок | MIFB |
+| Жесты, пружины, физика | `apple-design` |
+| Производительность | `animation-performance` |
 
-## Когда **не** анимировать
+Пример: нажатие — `scale(0.97)` у Эмиля и `scale(0.96)` у MIFB. Оба верны; в рамках
+одной задачи используй один.
 
-| Случай | Почему |
+## Что выше первоисточников
+
+**Токены конкретного проекта** (`artifacts/design-system.md`). Если в DS уже есть
+`--ease-out` или шкала длительностей — используй их. Это не конфликт: Эмиль говорит
+«используй свою кастомную кривую», а проект решает, какую именно.
+
+## Шпаргалка
+
+Минимум без загрузки скилла. **Если строка расходится со скиллом — прав скилл,
+а строку надо исправить.**
+
+| Правило | Источник |
 |---|---|
-| Часто повторяющиеся действия (открытие command palette N раз в день) | Превращается в раздражитель |
-| Клавиатурная навигация (стрелки, tab) | *«You should never animate them»* — создаёт ощущение задержки |
-| Когда user явно спешит / работает по сценарию | Анимация = трение |
-| Каждый hover мелкого элемента | Шум |
+| Действия 100+ раз в день и клавиатуру — не анимировать никогда | `emil-design-eng` |
+| Вход и выход → `ease-out`; движение по экрану → `ease-in-out`; постоянное движение → `linear` | `emil-design-eng` |
+| `ease-in` на UI — никогда: задерживает старт ровно в тот момент, когда пользователь смотрит | `emil-design-eng`, `animate` |
+| Встроенные кривые слабые — кастомные, например `cubic-bezier(0.23, 1, 0.32, 1)` | `emil-design-eng` |
+| UI до 300ms; модалки и drawer — 200–500ms | `animate` |
+| Выход короче и тише входа | MIFB `animations.md` |
+| Никогда `scale(0)`: старт с 0.9–0.97 + opacity | `emil-design-eng`, `animate` |
+| Нажатие: `scale(0.97)`, 100–160ms ease-out | `emil-design-eng` |
+| Частый hover — минимальная смена фона ≤150ms; scale на hover — только за `@media (hover: hover) and (pointer: fine)` | MIFB, `emil-design-eng` |
+| Медленно там, где решает пользователь (удержание 2s), быстро — ответ системы (отпускание 200ms) | `animate` |
+| Popover растёт из триггера; модалка — по центру | `emil-design-eng` |
+| Надёжно дёшево — `transform` и `opacity`. `filter`, `clip-path`, `background-color` — тоже композит в современных браузерах, но проверять | `animation-performance` |
+| Animated blur ≤ 20px, обычно хватает 2–5px | `animation-performance` |
+| Не анимировать `width`/`height`/`top`/`left`/`margin`/`padding` | `animation-performance` |
+| `transition: all` — никогда, перечисляй свойства | `emil-design-eng` |
+| Интерактивное (hover, toggle) — CSS transitions, они прерываются; keyframes — только для разовых последовательностей | MIFB `animations.md` |
+| Жесты — пружины, а не CSS: они наследуют скорость и перехватываются на лету | `apple-design` |
+| Пружины по умолчанию без перелёта; bounce — только когда жест сам нёс импульс | `apple-design` |
+| `will-change` — последний шаг, только когда увидел сдвиг на 1px | `animation-performance` |
+| Reduced motion — **меньше и мягче, не ноль**: оставить opacity и цвет, убрать перемещение | `emil-design-eng`, `apple-design`, MIFB |
 
-## CSS Transforms нюансы (Emil)
+## Чего нет в первоисточниках
 
-| Функция | Best practice |
+| Тема | Где |
 |---|---|
-| `translate()` | Использовать **проценты** (`translateY(100%)`) — адаптивно к размеру элемента |
-| `scale()` | См. Scale-правила выше |
-| `rotate()` | Реже нужен. Для естественности (drawer с лёгким наклоном) |
-| `3D transforms` | `rotateX/Y` + `transform-style: preserve-3d` для глубины |
-| `transform-origin` | Основа origin-aware. По умолчанию центр |
-
-> *«Percentage values are less error-prone since they're relative to the element's own size»*
-
-## Финальный штрих
-
-> *«Filter: blur(2px) как последний шаг»* — Emil
-
-`filter: blur(2px)` маскирует мелкие неровности перехода между состояниями. Применяй точечно, не везде.
-
-## Anti-patterns
-
-| Anti-pattern | Симптом | Источник |
-|---|---|---|
-| `transition: all` | Скрытые поломки в будущем | Comeau |
-| Симметричные hover (300ms / 300ms) | Ощущается «как робот» | Comeau |
-| `scale(0)` старт | Объект телепортируется | Kowalski |
-| Анимация `height: auto` | Тормоза, jank | Comeau / Kowalski |
-| Анимация на каждый клавиатурный action | Замедляет работу | Kowalski |
-| Bounce / elastic без причины | Generic-AI-look | Refactoring UI |
-| Built-in CSS easing для critical motion | Не передаёт нужной энергии | Kowalski |
-| Нет `prefers-reduced-motion` | Accessibility сломана | research consensus |
-
-## Performance
-
-- Только `transform`/`opacity` (causes только composite, не layout/paint).
-- `will-change: transform` перед сложной анимацией — но **не** оставлять навсегда.
-- Hardware acceleration (CSS transition / WAAPI) > JS animation для UI.
-- Прерываемость: пользователь должен мочь прервать анимацию в любой момент с плавным переходом (Framer Motion, WAAPI).
-
-## Cross-platform
-
-| Платформа | Длительность | Easing |
-|---|---|---|
-| Web UI | < 300ms | ease-out / custom |
-| iOS native | < 250ms | Apple system easing |
-| Android Material | < 300ms | Material standard easing |
+| Нативный Android: токены движения Material 3 | `platforms/mobile-craft-rules.md` |
+| Ритм новизны: не ставить 5+ анимированных секций подряд, чередовать с тишиной (Rauno Freiberg) | `craft/craft-core.md` |

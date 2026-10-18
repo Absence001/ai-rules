@@ -99,15 +99,17 @@
 
 ## Mobile motion
 
-См. `craft/motion-rules.md`. Mobile-specific уточнения:
+См. `craft/motion-rules.md`. По платформам:
 
-| Платформа | Длительность | Easing |
+| Платформа | Чем двигать | Источник |
 |---|---|---|
-| iOS native | < 250ms | Apple system easing |
-| Android Material | < 300ms | Material standard easing |
-| Cross-platform | < 300ms | ease-out / custom |
+| iOS native / Apple-подобный UI | Пружины, а не длительности: по умолчанию без перелёта (damping 1.0), bounce — только после жеста с импульсом | `apple-design` |
+| React Native / Expo | Reanimated + Gesture Handler, движение вне JS-потока | `animate-expo` |
+| Android native | Токены движения Material 3 (easing и duration tokens) | Material 3 — в первоисточниках не покрыто |
+| Веб на телефоне | Кривые и длительности как в вебе + тач-специфика (hover-залипание, tap highlight, 100vh) | `animate`, `mobile-native` |
 
-**Уважай `prefers-reduced-motion`** — на mobile это особенно важно (motion sickness, attention).
+**Reduced motion** — на mobile особенно важно (укачивание, внимание): убрать перемещение,
+оставить opacity и цвет. Не выключать всё — теряется понятность переходов *(`apple-design`)*.
 
 ## Связанные файлы
 

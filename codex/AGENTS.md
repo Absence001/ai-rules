@@ -42,7 +42,11 @@
 - Framework: **Next.js (App Router)**
 - Language: **TypeScript** (strict mode, no `any`)
 - Styles: **Tailwind CSS**
-- Components: **shadcn/ui** (композитные, не closed-box)
+- Components: **shadcn/ui** (композитные, не closed-box) — **по умолчанию**.
+  Скилл `pick-ui-library` (Эмиль) — только по явному запросу и для задач вне этого стека
+  (тосты → Sonner, чарты, виртуализация, drag-and-drop, state). Его рекомендацию base-ui
+  для unstyled-компонентов в проектах на shadcn **не применять**: примитивы берутся те,
+  на которых собран shadcn в проекте, иначе в одном интерфейсе окажутся две библиотеки примитивов.
 - Database: Postgres + Drizzle ORM (если нужна БД)
 - Content: MDX (для долгоживущего контента)
 - Compiler: React Compiler включён

@@ -29,7 +29,7 @@
 | **Typography** | font-family, font-size, font-weight, line-height, letter-spacing (composite token) |
 | **Radius** | xs, sm, md, lg, full |
 | **Elevation / shadow** | level-0 .. level-5 |
-| **Motion** | duration (fast/standard/slow), easing (standard/decelerate/accelerate) |
+| **Motion** | duration (fast/standard/slow), easing (out/in-out/linear) — без `accelerate` (= ease-in): на UI он запрещён, см. `craft/motion-rules.md` |
 | **Sizing** | icon, control-height, container max-widths |
 | **Breakpoints** | xs / sm / md / lg / xl / 2xl |
 | **Border** | width (thin / thick), style |
@@ -171,8 +171,10 @@ padding: var(--stack-padding-some-size); /* check-token */
 
 ### Motion
 
-- **MUST** keep UI animations ≤ `motion.duration.medium` (300ms)
-- **MUST** respect `prefers-reduced-motion`
+- **MUST** keep UI animations ≤ `motion.duration.standard` (300ms); модалки и drawer — до `motion.duration.slow` (≤500ms)
+- **MUST** respect `prefers-reduced-motion`: убрать перемещение, оставить opacity и цвет — не выключать всё
+- **MUST NOT** использовать ease-in (`accelerate`) на UI-элементах
+- Значения кривых и длительностей — из таблиц скилла `animate` (первоисточник), если в проекте ещё нет своих
 - **SHOULD** использовать `motion.transition.*` для смены состояний
 
 ### Z-Index
