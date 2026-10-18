@@ -1,0 +1,6 @@
+interface:
+  display_name: "Screenshot to Code"
+  short_description: "Скриншот в React-прототип"
+  default_prompt: "Use $screenshot-to-code to reconstruct a UI from a screenshot as React."
+policy:
+  allow_implicit_invocation: true

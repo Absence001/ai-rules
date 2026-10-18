@@ -1,0 +1,6 @@
+interface:
+  display_name: "Craft Audit"
+  short_description: "Visual polish, визуальный регистр, anti-slop"
+  default_prompt: "Use $craft-audit to audit and polish a UI to craft level."
+policy:
+  allow_implicit_invocation: true

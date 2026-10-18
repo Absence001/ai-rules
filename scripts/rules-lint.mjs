@@ -52,7 +52,20 @@ function add(level, rule, file, msg) {
 
 // ── разрешение ссылки на файл (учитывает непоследовательный стиль путей) ──────
 // Возвращает: {ok} | {ambiguous:[...]} | {missing:true}
-function resolveRef(ref) {
+// fromRel — rel-путь файла-источника; нужен, чтобы относительные ссылки
+// (./x.md, ../sibling/x.md) резолвились от него, а не падали в basename-поиск.
+function resolveRef(ref, fromRel) {
+  // 0) относительная ссылка от файла-источника
+  if (fromRel && /^\.\.\//.test(ref)) {
+    const parts = `${fromRel.split("/").slice(0, -1).join("/")}/${ref}`.split("/");
+    const stack = [];
+    for (const part of parts) {
+      if (part === "" || part === ".") continue;
+      if (part === "..") stack.pop();
+      else stack.push(part);
+    }
+    return relSet.has(stack.join("/")) ? { ok: true } : { missing: true };
+  }
   let r = ref.replace(/^\.\//, "").replace(/^@/, "").replace(/^memory-bank\//, "");
   // 1) точный путь от корня
   if (relSet.has(ref.replace(/^@/, "")) || relSet.has(r)) return { ok: true };
@@ -117,7 +130,7 @@ for (const rel of LINT_TARGETS) {
     if (isPipelineArtifact(ref)) continue;                // output пайплайна — не в репо правил
     if (isExternalPath(ref)) continue;                    // ~/.codex, RULES_ROOT — внешнее разрешение
     if (NON_FILE_TOKENS.has(ref)) continue;               // имя токена, не файл
-    const res = resolveRef(ref);
+    const res = resolveRef(ref, rel);
     // path-ref со слэшем — строгая ошибка; bare-ref — предупреждение (по природе неоднозначен)
     const missLevel = ref.includes("/") ? "error" : "warn";
     if (res.missing) add(missLevel, "R1 stale-ref", rel, `нет файла для ссылки: ${ref}`);

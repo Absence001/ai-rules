@@ -1,0 +1,6 @@
+interface:
+  display_name: "Code Diagnostics"
+  short_description: "Диагностика багов и ошибок до починки"
+  default_prompt: "Use $code-diagnostics to diagnose a bug before fixing it."
+policy:
+  allow_implicit_invocation: true

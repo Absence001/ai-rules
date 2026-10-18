@@ -6,14 +6,16 @@
 
 Все пути — относительно `RULES_ROOT/memory-bank/`.
 
-## Routing — 3 уровня (Claude использует Skills, Codex использует этот файл)
+## Routing — 3 уровня (скиллы в обоих рантаймах, этот файл — fallback)
 
-> Skills для Claude — это **layer 1+2 в одном** (keywords + intent через description). Для Codex (нет Skills) — используется этот файл напрямую как layer 1, **intent column** даёт layer 2.
+> Скиллы раздаются **обоим** рантаймам через `sync-rules.bat`: Claude — в `~/.claude/skills/`, Codex — в `~/.codex/skills/` и `~/.agents/skills/`. У каждого скилла есть `agents/openai.yaml` с интерфейсными метаданными для Codex.
+>
+> Скилл — это **layer 1+2 в одном** (keywords + intent через `description`). Этот файл нужен, когда скилл не сматчился или задача лежит между скиллами.
 
-| Layer | Что | Кому |
+| Layer | Что | Как |
 |---|---|---|
-| **Layer 1 — Keywords** | Точное слово из триггеров → match | Claude через Skills `trigger_keywords`, Codex через keywords здесь |
-| **Layer 2 — Intent** | Запрос матчит смысл (даже без точных слов) | Claude через Skills `intent:` description, Codex через **Intent column** ниже |
+| **Layer 1 — Keywords** | Точное слово из триггеров → match | `description` скилла; в Codex ещё явный вызов `$<имя>` или `/skills` |
+| **Layer 2 — Intent** | Запрос матчит смысл (даже без точных слов) | `description` скилла; **Intent column** ниже для прямого роутинга |
 | **Layer 3 — Ask** | Match неясен | Спросить «это про X или Y?», не угадывать |
 
 ## Правила использования index
@@ -53,6 +55,7 @@
 | **Component documentation** | дока компонента, doc | «Напиши доку», «опиши API», README для компонента | `pd-workflows/component-documentation.md`, `design-system/component-anatomy.md` | `design-system.md` | research, IA |
 | **Bug / code diagnostics** | баг, ошибка, не работает, fix | Stack trace / error в сообщении; «не запускается» | `code-diagnostics/code-diagnostics.md`, `meta/calibration.md`. При frontend — `platforms/frontend-implementation-rules.md` | `project-state.md` (контекст) | research, IA, DS |
 | **Pipeline / orchestration** | meta, оркестрация, pipeline | Вопросы «где мы», «что дальше», координация stages | `meta/pipeline-orchestration.md`, `meta/artifact-contracts.md`, `meta/operating-principles.md` | `project-state.md`, все relevant artifacts | content, mobile |
+| **Цикл обучения / инстинкты** | инстинкт, distill, дистилляция, что система выучила | «разбери сессии», «обнови инстинкты», промоушен выученного в правила | `meta/learning-loop.md` | — | DS, craft, research |
 
 ## Когда читать `artifacts/research/*`
 

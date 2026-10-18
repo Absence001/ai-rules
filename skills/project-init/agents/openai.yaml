@@ -1,0 +1,6 @@
+interface:
+  display_name: "Project Init"
+  short_description: "Бутстрап проекта из ai-rules"
+  default_prompt: "Use $project-init to bootstrap a new project from ai-rules."
+policy:
+  allow_implicit_invocation: true

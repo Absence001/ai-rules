@@ -1,6 +1,15 @@
 # ai-rules
 
-Единое хранилище правил для Claude Code и OpenAI Codex CLI. Подход: общее ядро + tool-specific дополнения + модульный memory-bank.
+Единое хранилище правил для OpenAI Codex CLI (основной рантайм) и Claude Code (специалист по Figma). Подход: общее ядро + tool-specific дополнения + модульный memory-bank + замкнутый цикл обучения.
+
+## Роли
+
+| Рантайм | Роль |
+|---|---|
+| **Codex CLI** | Основной: ведёт пайплайн brief → SRGID → research → IA → DS → screens → craft, пишет код, держит `project-state.md` |
+| **Claude Code** | Специалист: Figma MCP и визуальные решения, требующие макета. Вызывается явно под задачу |
+
+Скиллы раздаются **обоим** рантаймам. Передача контекста между ними — через `artifacts/project-state.md`.
 
 ## Источник правды
 
@@ -76,8 +85,26 @@ ai-rules/
 ### Codex CLI (глобально)
 
 `~/.codex/AGENTS.md` — собирается из `AGENTS.md` + `codex/AGENTS.md` через `sync-rules.bat`.
+Скиллы — в `~/.codex/skills/` и `~/.agents/skills/` (обе локации, т.к. читаемая зависит от версии Codex).
 
 После каждого обновления правил — запусти `sync-rules.bat`.
+
+### Хуки и цикл обучения
+
+`sync-rules.bat` раскладывает хуки по обоим рантаймам через `scripts/install-hooks.mjs`:
+
+| Хук | Событие | Что делает |
+|---|---|---|
+| `guard-hook.mjs` | PreToolUse | блокирует всегда-запрещённые команды |
+| `observe.mjs` | PostToolUse, UserPromptSubmit | пишет наблюдения сессии |
+| `inject-instincts.mjs` | SessionStart | подмешивает выученные инстинкты |
+
+**Codex требует подтвердить хуки:** запусти `/hooks` в Codex CLI. Доверие привязано к хешу,
+поэтому после каждого изменения скриптов его нужно подтвердить заново.
+**Claude Code** читает хуки на старте — нужен перезапуск сессии.
+
+Как устроен цикл обучения и что с ним делать — `memory-bank/meta/learning-loop.md`.
+Разбор наблюдений — скилл `distill`.
 
 ### Новый проект (default — global-only)
 

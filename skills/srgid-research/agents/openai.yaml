@@ -1,0 +1,6 @@
+interface:
+  display_name: "SRGID Research"
+  short_description: "Scope / Reality / Gap / Impact / Decision"
+  default_prompt: "Use $srgid-research to run SRGID research before a product decision."
+policy:
+  allow_implicit_invocation: true
