@@ -1,81 +1,157 @@
 # Skills
 
-Skills — **Claude-only** обёртки над memory-bank. Codex CLI продолжает читать `AGENTS.md` + `codex/AGENTS.md` напрямую.
+Модульное знание, которое рантайм грузит **по требованию** (матч по `description`),
+а не держит в контексте целиком.
 
-## Что это
+Раздаются **обоим** рантаймам через `sync-rules.bat`:
 
-Skill — модульное знание, которое Claude грузит **по требованию** (через description + intent matching), а не сразу всё в контекст. См. `RULES_ROOT/AGENTS.md` и Anthropic Skills docs.
+| Локация | Рантайм |
+|---|---|
+| `~/.claude/skills/` | Claude Code |
+| `~/.codex/skills/` и `~/.agents/skills/` | Codex CLI (обе — читаемая зависит от версии) |
 
-## 11 skills
+Source of truth — `ai-rules/skills/`. Руками в runtime-локациях не править: перезатрётся.
+
+## Состав — 32 скилла
+
+### Наши — пайплайн (17)
 
 | Skill | Когда триггерится | Указывает на (memory-bank/) |
 |---|---|---|
 | `project-init` | Пустая папка, «новый проект», bootstrap | `templates/*` |
-| `product-brief` | Новый проект (после init), расплывчатый запрос | `discovery/brief-expander.md` |
+| `product-brief` | Расплывчатый запрос, нужен бриф | `discovery/brief-expander.md` |
 | `srgid-research` | Research, конкуренты, SRGID | `discovery/srgid-*.md`, `sources-trust.md` |
 | `ia-design` | IA, sitemap, flow | `ia-flow/*.md` |
-| `design-system` | Tokens, components, variants, theming | `design-system/*.md` |
-| `mobile-design` | iOS / Android / mobile | `platforms/mobile-*.md` |
-| `craft-audit` | Polish, anti-slop, visual review | `craft/*.md` |
-| `screenshot-to-code` | Прикреплён скриншот, восстановить UI | `screenshot-to-code/`, `craft/*.md`, frontend |
+| `design-system` | Токены, компоненты, варианты, theming | `design-system/*.md` |
+| `mobile-design` | Дизайн под iOS / Android как платформу | `platforms/mobile-*.md` |
+| `craft-audit` | Этап краф-аудита: регистр + anti-slop целиком | `craft/*.md` |
+| `make-interfaces-feel-better` | Конкретная деталь вёрстки | — (самодостаточный) |
+| `screenshot-to-code` | Прикреплён скриншот, восстановить UI | `screenshot-to-code/`, `craft/*` |
 | `frontend-impl` | React / Next.js / TS код | `platforms/frontend-implementation-rules.md` |
-| `code-diagnostics` | Баг, ошибка, fix | `code-diagnostics/*.md`, `meta/calibration.md` |
+| `code-diagnostics` | Баг, ошибка, fix | `code-diagnostics/*`, `meta/calibration.md` |
 | `pipeline-control` | Мета: где мы, что дальше | `meta/*.md` |
+| `distill` | Разбор наблюдений в инстинкты | `meta/learning-loop.md` |
+| `council` | Неоднозначное решение: четыре независимых голоса до выбора | `meta/anti-sycophancy.md`, Four Big Risks |
+| `skill-scout` | Перед созданием скилла — найти, не покрыто ли уже | `VENDOR.md`, этот файл |
+| `serega-gentle` | Посимвольное раскрытие длинного текста | — |
+| `serega-emotional` | Посимвольное раскрытие короткого акцента | — |
 
-## Структура SKILL.md (по образцу Academic Research Skills v3+)
+### Эмиля Ковальски — движение и craft (15)
+
+Завендорены из `emilkowalski/skills`, MIT. Провенанс и правила обновления — `VENDOR.md`.
+`SKILL.md` у них **не редактируем**.
+
+| Skill | Когда триггерится |
+|---|---|
+| `emil-design-eng` | Суждение: анимировать ли, какая кривая, как устроен компонент |
+| `animate` | Построить анимацию с нуля (веб) |
+| `animate-expo` | То же для React Native / Expo: жесты, шиты, хаптика |
+| `review-animations` | Ревью существующего движения *(только явный вызов)* |
+| `improve-animations` | Аудит движения по всей кодовой базе + план правок |
+| `animation-performance` | Анимация роняет кадры |
+| `find-animation-opportunities` | Где стоит добавить движение, а где нет |
+| `animation-vocabulary` | «Как называется вот этот эффект» |
+| `apple-design` | Подход Apple к движению и материалам, перенесённый в веб |
+| `mobile-native` | Веб-приложение ощущается не нативно на телефоне |
+| `break-ui` | Стресс-тест компонента худшими данными |
+| `pick-ui-library` | Выбрать библиотеку под задачу *(только явный вызов)* |
+| `prototype` | Несколько разных версий UI для сравнения *(только явный вызов)* |
+| `ask-sonner` | Библиотека тостов Sonner |
+| `write-swift` | Современный Swift |
+
+---
+
+## Разведение пересекающихся скиллов
+
+Четыре источника говорят о «качестве интерфейса», и без границы матчится не тот.
+Граница — **масштаб и тип вопроса**, а не тема.
+
+| Запрос | Кому | Почему именно ему |
+|---|---|---|
+| «Доведи экран до ума», «выглядит как AI», выбрать визуальный регистр | **`craft-audit`** | Этап пайплайна: смотрит экран целиком, оставляет `artifacts/craft-audit.md` |
+| Радиус, оптическое выравнивание, tabular numbers, хит-зона, тени, сглаживание шрифта | **`make-interfaces-feel-better`** | Чеклист конкретных деталей реализации |
+| «Стоит ли это анимировать», какая кривая и длительность, как устроен компонент | **`emil-design-eng`** | Суждение, а не чеклист |
+| «Сделай анимацию» | **`animate`** / `animate-expo` | Построение с нуля |
+| «Посмотри мою анимацию» | **`review-animations`** | Ревью по высокой планке; только явный вызов |
+| «Улучши анимации во всём приложении» | **`improve-animations`** | Масштаб кодовой базы, выдаёт план |
+| «Дёргается / лагает» | **`animation-performance`** | Бюджет кадра, композитные свойства |
+| «Что тут вообще можно оживить» | **`find-animation-opportunities`** | Поиск возможностей, read-only |
+| Появление текста посимвольно: заголовок, фраза | **`serega-gentle`** (длинный текст, несколько на странице) / **`serega-emotional`** (2–4 слова, акцент) | Готовый эффект раскрытия текста, а не анимация с нуля — не `animate` |
+| Жесты, пружины, импульс, «как в iOS» | **`apple-design`** | Физика движения и прерываемость |
+| «Как называется этот эффект» | **`animation-vocabulary`** | Название эффекта, не построение |
+| Дизайн под iOS/Android: тач-таргеты, HIG, MD3 | **`mobile-design`** (наш) | Платформенный дизайн |
+| Веб на телефоне: sticky hover, 100vh, zoom инпутов, notch | **`mobile-native`** (Эмиля) | Веб-специфика на тач-устройстве |
+
+### Правило масштаба
+
+```
+экран целиком      → craft-audit
+одна деталь        → make-interfaces-feel-better
+вопрос «как надо?» → emil-design-eng
+конкретная работа  → профильный скилл движения
+```
+
+### Приоритет при конфликте
+
+**Как делать движение и детали — решают первоисточники** (Эмиль, MIFB, `apple-design`),
+а не наш `memory-bank/`. Наши прежние правила были их пересказом и разошлись с оригиналом
+в трёх местах (`ease-in` на уход, reduced motion «выключить всё», hover-выход 450ms) —
+`RULES-GOVERNANCE.md` #L7.
+
+Выше первоисточников — только **токены конкретного проекта**: если в DS есть своя кривая
+или шкала длительностей, используй её. Это выбор значения внутри правила, а не конфликт.
+
+Между самими первоисточниками: движение — Эмиль, поверхности и типографика — MIFB,
+жесты и пружины — `apple-design`. Подробнее — `memory-bank/craft/motion-rules.md`.
+
+Основание — исключение в `AGENTS.md` → «Приоритет источников».
+
+---
+
+## Структура SKILL.md (для наших скиллов)
 
 ```yaml
 ---
 name: skill-name
 status: active
-description: <one-line trigger + role>
+description: <триггер + роль + явное «НЕ для X»>
 trigger_keywords:
   ru: [...]
   en: [...]
 intent: |
-  <intent description for Layer 2 routing>
+  <смысловое описание для Layer 2>
 task_type: outcome-gradable
 related_skills: [...]
-data_access_level: raw | redacted | verified_only
 ---
+```
 
-# Skill Name
+`agents/openai.yaml` — интерфейсные метаданные Codex, есть у **всех** скиллов,
+включая вендоренные (там это наш файл, а не апстримовый):
 
-## Когда триггерится
+```yaml
+interface:
+  display_name: "..."
+  short_description: "..."
+  default_prompt: "Use $skill-name to ..."
+policy:
+  allow_implicit_invocation: true   # false = только явный вызов
+```
 
-## Что читать
+## Routing — 3 слоя
 
-## [Скилл-специфичные секции]
+1. **Keywords** — точное слово из триггеров → активация
+2. **Intent** — запрос матчит смысл без точных слов → активация
+3. **Ask** — match неясен → спросить «это про X или Y?», не угадывать
+
+Таблица выше — разрешение слоя 3 для craft-пересечений: вместо вопроса смотри масштаб.
 
 ## Anti-Patterns
 
-| Pattern (WRONG) | Why it fails | Correct (RIGHT) |
+| ❌ | Почему плохо | ✅ |
 |---|---|---|
-
-## Outcome
-```
-
-## Routing (3 layers)
-
-1. **Layer 1 — Keywords** (high confidence)
-   Если в запросе есть точное слово из `trigger_keywords` → activate
-2. **Layer 2 — Intent** (по смыслу)
-   Если запрос матчится `intent` description (даже без точных keywords) → activate
-3. **Layer 3 — Fallback** (ask user)
-   Если match неясен — спросить пользователя «это про X или Y?», не угадывать
-
-## Source of truth
-
-- Skills в `ai-rules/skills/` — git-tracked, source of truth
-- `~/.claude/skills/` — runtime копия (Claude discoverable location)
-- Sync через `sync-rules.bat`
-
-## Anti-Patterns про Skills
-
-| Pattern (WRONG) | Why it fails | Correct (RIGHT) |
-|---|---|---|
-| Описать skill в одной строке без триггеров | Claude не найдёт | Полный YAML frontmatter |
-| Не различать `trigger_keywords` и `intent` | Skill активируется криво | Keywords = high-confidence, Intent = semantic |
-| Дублировать содержимое memory-bank в SKILL.md | Drift между skill и source of truth | SKILL.md ссылается на memory-bank/X.md |
-| Создать skill для очень узкой задачи | Slop, шум в списке | Минимум — стабильная категория задач |
-| Не обновить sync после изменения skill | Claude видит старую версию | sync-rules.bat |
+| Описать skill одной строкой без границ | Матчится на чужие задачи | Описание + явное «НЕ для X» |
+| Править `SKILL.md` вендоренного скилла | Потеряется при обновлении, расхождение незаметно | Маршрутизировать в `README.md`, не править |
+| Дублировать содержимое memory-bank в SKILL.md | Drift между скиллом и источником | Ссылаться на `memory-bank/<файл>.md` |
+| Создать скилл под очень узкую задачу | Шум в списке, падает точность матча | Минимум — стабильная категория |
+| Чинить деталь внутри `craft-audit` | Этап пайплайна подменяет профильный скилл | Назвать находку и передать профильному |
+| Не прогнать `sync-rules.bat` после правки | Рантайм видит старую версию | Прогнать синк |

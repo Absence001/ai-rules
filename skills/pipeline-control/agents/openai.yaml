@@ -1,0 +1,6 @@
+interface:
+  display_name: "Pipeline Control"
+  short_description: "Где мы в пайплайне и что дальше"
+  default_prompt: "Use $pipeline-control to check pipeline stage gates and decide the next step."
+policy:
+  allow_implicit_invocation: true

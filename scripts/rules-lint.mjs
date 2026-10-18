@@ -10,6 +10,7 @@
 //   R4 secret        — hardcoded API-ключи/токены в правилах
 //   R5 skill-shape   — skills/* в kebab-case, есть SKILL.md с name/description
 //   R6 sync-drift    — ~/.codex/AGENTS.md совпадает с источником (AGENTS.md + codex/AGENTS.md)
+//   R7 skill-routing — каждый скилл в skills/README.md; craft/motion-скиллы разведены
 
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { join, relative, basename, extname } from "node:path";
@@ -52,7 +53,20 @@ function add(level, rule, file, msg) {
 
 // ── разрешение ссылки на файл (учитывает непоследовательный стиль путей) ──────
 // Возвращает: {ok} | {ambiguous:[...]} | {missing:true}
-function resolveRef(ref) {
+// fromRel — rel-путь файла-источника; нужен, чтобы относительные ссылки
+// (./x.md, ../sibling/x.md) резолвились от него, а не падали в basename-поиск.
+function resolveRef(ref, fromRel) {
+  // 0) относительная ссылка от файла-источника
+  if (fromRel && /^\.\.\//.test(ref)) {
+    const parts = `${fromRel.split("/").slice(0, -1).join("/")}/${ref}`.split("/");
+    const stack = [];
+    for (const part of parts) {
+      if (part === "" || part === ".") continue;
+      if (part === "..") stack.pop();
+      else stack.push(part);
+    }
+    return relSet.has(stack.join("/")) ? { ok: true } : { missing: true };
+  }
   let r = ref.replace(/^\.\//, "").replace(/^@/, "").replace(/^memory-bank\//, "");
   // 1) точный путь от корня
   if (relSet.has(ref.replace(/^@/, "")) || relSet.has(r)) return { ok: true };
@@ -97,6 +111,24 @@ const LINT_TARGETS = allRel.filter(
     r === "rules-index.md",
 );
 
+// ── вендоренные скиллы (skills/VENDOR.md, блок ```vendored) ──────────────────
+// Их SKILL.md не редактируем: правка потеряется при обновлении из апстрима.
+// Поэтому R1/R2/R3 к ним не применяем — их ссылки указывают на файлы ЦЕЛЕВОГО
+// проекта (plans/, scripts/), а объём задан автором. R4 (секреты) и R5 (форма) —
+// применяем: это вопрос безопасности и совместимости, а не стиля.
+const VENDORED = new Set();
+{
+  const vendorFile = join(ROOT, "skills", "VENDOR.md");
+  if (existsSync(vendorFile)) {
+    const block = readFileSync(vendorFile, "utf8").match(/```vendored\r?\n([\s\S]*?)```/);
+    if (block) for (const n of block[1].split(/\r?\n/)) if (n.trim()) VENDORED.add(n.trim());
+  }
+}
+const isVendored = (rel) => {
+  const mm = rel.match(/^skills\/([^/]+)\//);
+  return Boolean(mm && VENDORED.has(mm[1]));
+};
+
 // множество путей, которые вообще похожи на внутренние ссылки (оканчиваются .md)
 const REF_RE = /`([^`]+?\.md)`|\]\(([^)]+?\.md)(?:#[^)]*)?\)|@([A-Za-z0-9/_.:-]+\.md)|\[\[([^\]]+?)\]\]/g;
 
@@ -104,11 +136,12 @@ for (const rel of LINT_TARGETS) {
   const abs = join(ROOT, rel);
   const text = readFileSync(abs, "utf8");
   const lines = text.split(/\r?\n/);
+  const vendored = isVendored(rel);
 
   // R1 stale-ref
   let m;
   REF_RE.lastIndex = 0;
-  while ((m = REF_RE.exec(text))) {
+  while (!vendored && (m = REF_RE.exec(text))) {
     let ref = m[1] || m[2] || m[3] || m[4];
     if (!ref) continue;
     if (m[4] && !ref.endsWith(".md")) ref = `${ref}.md`; // [[wikilink]] → wikilink.md
@@ -117,7 +150,7 @@ for (const rel of LINT_TARGETS) {
     if (isPipelineArtifact(ref)) continue;                // output пайплайна — не в репо правил
     if (isExternalPath(ref)) continue;                    // ~/.codex, RULES_ROOT — внешнее разрешение
     if (NON_FILE_TOKENS.has(ref)) continue;               // имя токена, не файл
-    const res = resolveRef(ref);
+    const res = resolveRef(ref, rel);
     // path-ref со слэшем — строгая ошибка; bare-ref — предупреждение (по природе неоднозначен)
     const missLevel = ref.includes("/") ? "error" : "warn";
     if (res.missing) add(missLevel, "R1 stale-ref", rel, `нет файла для ссылки: ${ref}`);
@@ -128,7 +161,8 @@ for (const rel of LINT_TARGETS) {
   // R3 max-lines / token-budget
   // max-lines — сигнал bloat ТОЛЬКО в паре с тяжестью по токенам (строки без токенов = не проблема).
   const approxTokens = Math.round(text.length / 4);
-  if (lines.length > MAX_LINES && approxTokens > TOKEN_WARN)
+  if (vendored) { /* объём задан автором апстрима — не наш bloat */ }
+  else if (lines.length > MAX_LINES && approxTokens > TOKEN_WARN)
     add("warn", "R3 max-lines", rel, `${lines.length} строк / ~${approxTokens} токенов — длинный И тяжёлый, дробить`);
   else if (approxTokens > TOKEN_WARN)
     add("warn", "R3 token-budget", rel, `~${approxTokens} токенов — тяжёлый файл, дробить?`);
@@ -142,6 +176,7 @@ for (const rel of LINT_TARGETS) {
 
 // R2 stale-command — команды, ссылающиеся на файлы репо (scripts/*, *.bat)
 for (const rel of LINT_TARGETS) {
+  if (isVendored(rel)) continue; // команды апстрима ссылаются на файлы целевого проекта
   const text = readFileSync(join(ROOT, rel), "utf8");
   const CMD_RE = /`[^`]*?(scripts\/[A-Za-z0-9._-]+|[A-Za-z0-9._-]+\.(?:bat|mjs|sh|py))[^`]*?`/g;
   let m;
@@ -198,6 +233,52 @@ try {
   }
 } catch (e) {
   add("warn", "R6 sync-drift", "~/.codex/AGENTS.md", `не удалось проверить: ${e.message}`);
+}
+
+// R7 skill-routing — каждый скилл достижим маршрутизацией, craft/motion-скиллы разведены.
+//
+// Почему не лексическое сходство описаний (как skill-stocktake у ECC): проверено на
+// 435 парах — максимум 0.10, а реальные пересечения (craft-audit ↔ emil-design-eng)
+// не видны вовсе: наши описания на русском, Эмиля — на английском, общих слов нет.
+// Поэтому проверяем детерминированный признак, а не похожесть текста:
+//   R7a — скилл упомянут в skills/README.md (иначе добавлен молча и ни к чему не привязан);
+//   R7b — скилл, касающийся движения или полировки, либо есть в таблице разведения,
+//         либо сам в описании отсылает к разведённому скиллу («for motion use X»).
+function skillDescription(text) {
+  const fm = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!fm) return "";
+  const lines = fm[1].split(/\r?\n/);
+  const i = lines.findIndex((l) => /^description\s*:/.test(l));
+  if (i < 0) return "";
+  const out = [lines[i].replace(/^description\s*:\s*(?:>-?|\|)?\s*/, "")];
+  for (let j = i + 1; j < lines.length && /^\s+\S/.test(lines[j]); j++) out.push(lines[j].trim());
+  return out.join(" ").toLowerCase();
+}
+
+{
+  const readme = join(ROOT, "skills", "README.md");
+  if (existsSync(readme) && existsSync(skillsDir)) {
+    const readmeText = readFileSync(readme, "utf8");
+    const routingSection = (readmeText.split(/^## Разведение пересекающихся скиллов/m)[1] || "").split(/^## /m)[0];
+    const mentioned = (text, name) => new RegExp(`\`${name}\``).test(text);
+    const names = readdirSync(skillsDir).filter((n) => existsSync(join(skillsDir, n, "SKILL.md")));
+    const routed = names.filter((n) => mentioned(routingSection, n));
+    // без «craft»: это слово встречается как название этапа пайплайна (pipeline-control),
+    // а сам craft-audit и так в таблице разведения
+    const CRAFT = /animat|анимац|motion|движени|easing|polish|полиров|hover|spring|пружин/;
+
+    for (const n of names) {
+      if (!mentioned(readmeText, n))
+        add("warn", "R7 skill-routing", `skills/${n}`, "скилл не упомянут в skills/README.md — добавлен молча, маршрута нет");
+
+      const desc = skillDescription(readFileSync(join(skillsDir, n, "SKILL.md"), "utf8"));
+      if (!CRAFT.test(desc) || routed.includes(n)) continue;
+      const selfRouted = routed.some((r) => r !== n && new RegExp(`(^|[^a-z-])${r}([^a-z-]|$)`).test(desc));
+      if (!selfRouted)
+        add("warn", "R7 skill-routing", `skills/${n}`,
+          "касается движения/полировки, но не разведён: добавь в таблицу «Разведение» в skills/README.md");
+    }
+  }
 }
 
 // ── отчёт ────────────────────────────────────────────────────────────────────

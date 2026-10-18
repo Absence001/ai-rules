@@ -1,0 +1,6 @@
+interface:
+  display_name: "Design Engineering (Emil)"
+  short_description: "Суждение: когда анимировать, какая кривая, как устроен компонент"
+  default_prompt: "Use $emil-design-eng to get design-engineering judgment on a UI decision."
+policy:
+  allow_implicit_invocation: true

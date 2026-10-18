@@ -1,0 +1,6 @@
+interface:
+  display_name: "Improve Animations"
+  short_description: "Аудит движения по кодовой базе с планом правок"
+  default_prompt: "Use $improve-animations to audit motion across a codebase and plan fixes."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,6 @@
+interface:
+  display_name: "IA & Flow Design"
+  short_description: "Sitemap, навигация, user flow, карта экранов"
+  default_prompt: "Use $ia-design to build information architecture and user flows."
+policy:
+  allow_implicit_invocation: true

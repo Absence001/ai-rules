@@ -1,0 +1,6 @@
+interface:
+  display_name: "Frontend Implementation"
+  short_description: "React/Next.js реализация по спекам DS"
+  default_prompt: "Use $frontend-impl to implement frontend per design-system specs."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Mobile Design"
+  short_description: "iOS HIG и Android MD3, платформенные паттерны"
+  default_prompt: "Use $mobile-design to design for iOS or Android with platform rules."
+policy:
+  allow_implicit_invocation: true

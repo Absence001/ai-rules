@@ -70,14 +70,9 @@
 
 ## Animation (cross-reference)
 
-См. `craft/motion-rules.md`. Hard rules:
-
-- Только `transform` / `opacity`
-- < 300ms для UI
-- `ease-out` для входов
-- `prefers-reduced-motion` обязательно
-- НЕ `transition: all`
-- Action-driven motion (hover-in ≠ hover-out)
+Источник — скиллы Эмиля и MIFB. Маршрут и шпаргалка — `craft/motion-rules.md`.
+Здесь правила не пересказываются: пересказ уже однажды разошёлся с оригиналом
+(`RULES-GOVERNANCE.md` #L7). Строишь анимацию — скилл `animate`.
 
 ## Forms
 

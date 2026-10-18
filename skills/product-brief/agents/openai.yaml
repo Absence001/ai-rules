@@ -1,0 +1,6 @@
+interface:
+  display_name: "Product Brief"
+  short_description: "Развернуть расплывчатый запрос в бриф"
+  default_prompt: "Use $product-brief to turn a vague request into a structured brief."
+policy:
+  allow_implicit_invocation: true

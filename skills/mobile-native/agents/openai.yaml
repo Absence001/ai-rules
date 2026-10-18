@@ -1,0 +1,6 @@
+interface:
+  display_name: "Mobile Native Feel"
+  short_description: "Веб-приложение на телефоне: хуки, 100vh, zoom, notch"
+  default_prompt: "Use $mobile-native to make a web app feel native on a phone."
+policy:
+  allow_implicit_invocation: true

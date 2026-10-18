@@ -6,14 +6,16 @@
 
 Все пути — относительно `RULES_ROOT/memory-bank/`.
 
-## Routing — 3 уровня (Claude использует Skills, Codex использует этот файл)
+## Routing — 3 уровня (скиллы в обоих рантаймах, этот файл — fallback)
 
-> Skills для Claude — это **layer 1+2 в одном** (keywords + intent через description). Для Codex (нет Skills) — используется этот файл напрямую как layer 1, **intent column** даёт layer 2.
+> Скиллы раздаются **обоим** рантаймам через `sync-rules.bat`: Claude — в `~/.claude/skills/`, Codex — в `~/.codex/skills/` и `~/.agents/skills/`. У каждого скилла есть `agents/openai.yaml` с интерфейсными метаданными для Codex.
+>
+> Скилл — это **layer 1+2 в одном** (keywords + intent через `description`). Этот файл нужен, когда скилл не сматчился или задача лежит между скиллами.
 
-| Layer | Что | Кому |
+| Layer | Что | Как |
 |---|---|---|
-| **Layer 1 — Keywords** | Точное слово из триггеров → match | Claude через Skills `trigger_keywords`, Codex через keywords здесь |
-| **Layer 2 — Intent** | Запрос матчит смысл (даже без точных слов) | Claude через Skills `intent:` description, Codex через **Intent column** ниже |
+| **Layer 1 — Keywords** | Точное слово из триггеров → match | `description` скилла; в Codex ещё явный вызов `$<имя>` или `/skills` |
+| **Layer 2 — Intent** | Запрос матчит смысл (даже без точных слов) | `description` скилла; **Intent column** ниже для прямого роутинга |
 | **Layer 3 — Ask** | Match неясен | Спросить «это про X или Y?», не угадывать |
 
 ## Правила использования index
@@ -37,22 +39,27 @@
 | **Project bootstrap** | новый проект, kickoff | Пустой `project-state.md`; запрос вида «давай начнём проект X» | `discovery/brief-expander.md` | `project-state.md` (если есть) | DS / craft / mobile |
 | **Brief / clarification** | расплывчатый запрос, ТЗ | Запрос < 3 строк без аудитории / цели / ограничений | `discovery/brief-expander.md`, `meta/operating-principles.md` | `project-state.md`, `brief.md` | implementation |
 | **Research (SRGID)** | research, анализ, конкуренты | Пользователь предлагает решение без объяснения проблемы | `discovery/srgid-research-core.md`, `srgid-methods.md`, `sources-trust.md`. При deep — `context-research.md` | `brief.md`, `srgid.md`, `research.md` | implementation, mobile |
-| **IA / sitemap / flow** | IA, навигация, flow, sitemap | Обсуждение какие экраны, переходы, главное действие | `ia-flow/ia-rules.md`, `flow-design.md` | `research.md`, `ia.md` | DS, motion, mobile-craft |
-| **Wireframing** | wireframe, lo-fi | «До визуала», «эскиз», «структура без полировки» | `pd-workflows/wireframing.md`, `ia-flow/ia-rules.md` | `ia.md`, `screens.md` | DS, motion |
-| **Design system / tokens** | DS, tokens, components | «token vs literal», «component vs variant», «новый или переиспользовать» | `design-system/design-system-core.md`, `tokens-spec.md`, `component-anatomy.md`. При Figma — `figma-code-parity.md`. При governance — `ds-governance.md` | `design-system.md` | mobile, content, research |
-| **Figma write** | Figma MCP, create/edit Figma | Любое write-действие в Figma через MCP | `design-system/figma-code-parity.md`, `design-system/tokens-spec.md` | `design-system.md` | research, IA |
+| **IA / sitemap / flow** | IA, навигация, flow, sitemap, информационная архитектура, структура экранов | Обсуждение какие экраны, переходы, главное действие | `ia-flow/ia-rules.md`, `flow-design.md` | `research.md`, `ia.md` | DS, motion, mobile-craft |
+| **Wireframing** | wireframe, lo-fi, вайрфрейм, эскиз | «До визуала», «эскиз», «структура без полировки» | `pd-workflows/wireframing.md`, `ia-flow/ia-rules.md` | `ia.md`, `screens.md` | DS, motion |
+| **Design system / tokens** | DS, tokens, components, дизайн-система, токены, компоненты | «token vs literal», «component vs variant», «новый или переиспользовать» | `design-system/design-system-core.md`, `tokens-spec.md`, `component-anatomy.md`. При Figma — `figma-code-parity.md`. При governance — `ds-governance.md` | `design-system.md` | mobile, content, research |
+| **Figma write** | Figma MCP, create/edit Figma, фигма, макет в фигме | Любое write-действие в Figma через MCP | `design-system/figma-code-parity.md`, `design-system/tokens-spec.md` | `design-system.md` | research, IA |
 | **Screens (hi-fi)** | screens, экраны, UI | После IA, перед / во время реализации UI | `ia-flow/flow-design.md`, `craft/visual-registers.md`, `craft/craft-core.md` | `ia.md`, `design-system.md`, `screens.md` | research, code-diagnostics |
-| **Mobile UI** | mobile, iOS, Android | Target platform mobile (native / cross-platform) | `platforms/mobile-platform-guidelines.md`, `mobile-craft-rules.md`, `craft/motion-rules.md` | `ia.md`, `design-system.md` | frontend (если только design), DS-governance |
-| **Frontend / React код** | код, React, Next.js, frontend | Discussion shifts к props / hooks / RSC / Tailwind classes / files | `platforms/frontend-implementation-rules.md`, `craft/motion-rules.md`. При DS-привязке — `design-system/tokens-spec.md` | `design-system.md`, `screens.md` | research, IA, mobile (если web) |
+| **Mobile UI** | mobile, iOS, Android, мобилка, мобильное приложение, айфон | Target platform mobile (native / cross-platform) | `platforms/mobile-platform-guidelines.md`, `mobile-craft-rules.md`, `craft/motion-rules.md` | `ia.md`, `design-system.md` | frontend (если только design), DS-governance |
+| **Frontend / React код** | код, React, Next.js, frontend, фронтенд, вёрстка, сверстать | Discussion shifts к props / hooks / RSC / Tailwind classes / files | `platforms/frontend-implementation-rules.md`, `craft/motion-rules.md`. При DS-привязке — `design-system/tokens-spec.md` | `design-system.md`, `screens.md` | research, IA, mobile (если web) |
 | **Screenshot → код** | скрин, screenshot, image-to-code | Прикреплён скриншот / референс, «сделай как тут» | `screenshot-to-code/image-to-code-workflow.md`, `craft/visual-registers.md`, `platforms/frontend-implementation-rules.md`, `craft/anti-slop-audit.md` | — | research, IA, mobile-platform |
-| **Craft audit / polish** | polish, audit, craft, anti-slop | UI «как AI-сгенерированный», «доведи до идеала», visual review | `craft/craft-core.md`, `visual-registers.md`, `anti-slop-audit.md`, `motion-rules.md` | `screens.md`, `craft-audit.md` | research, IA |
-| **Design handoff** | handoff, specs, передача в dev | Готовый дизайн → готовится к передаче, specs / redlines / dev review | `pd-workflows/design-handoff.md`, `design-system/component-anatomy.md`, `pd-workflows/component-documentation.md` | `design-system.md`, `screens.md` | research, IA |
-| **Design critique / review** | critique, review, feedback | Запрос оценки дизайн-решения, design review session | `pd-workflows/design-critique.md` | `screens.md` или конкретный артефакт | implementation |
+| **Craft audit / polish** | polish, audit, craft, anti-slop, полировка, аудит, довести до идеала | UI «как AI-сгенерированный», «доведи до идеала», visual review | `craft/craft-core.md`, `visual-registers.md`, `anti-slop-audit.md`, `motion-rules.md` | `screens.md`, `craft-audit.md` | research, IA |
+| **Деталь вёрстки** | радиус, тени, оптическое выравнивание, tabular numbers, хит-зона | Одна конкретная деталь, а не экран целиком | скилл `make-interfaces-feel-better` | — | research, IA |
+| **Движение / анимация** | анимация, motion, transition, easing, «дёргается» | Построить, отревьюить, ускорить или найти место для движения | `craft/motion-rules.md` (маршрут + шпаргалка), затем скилл по задаче: `animate`, `review-animations`, `improve-animations`, `animation-performance`, `emil-design-eng`. Первоисточники выше memory-bank; выше них — только токены проекта | `design-system.md` | research, IA |
+| **Design handoff** | handoff, specs, передача в dev, передача в разработку, спеки | Готовый дизайн → готовится к передаче, specs / redlines / dev review | `pd-workflows/design-handoff.md`, `design-system/component-anatomy.md`, `pd-workflows/component-documentation.md` | `design-system.md`, `screens.md` | research, IA |
+| **Design critique / review** | critique, review, feedback, критика, ревью, фидбек | Запрос оценки дизайн-решения, design review session | `pd-workflows/design-critique.md` | `screens.md` или конкретный артефакт | implementation |
 | **Microcopy / content** | тексты, метки, copy | Обсуждение слов в UI, labels, error messages, CTA | `pd-workflows/microcopy.md`, `ia-flow/ia-rules.md` (labels = words) | `ia.md`, `screens.md` | DS-governance, code |
 | **Accessibility audit** | a11y, WCAG, доступность | Запрос проверить интерфейс на доступность; aria; контраст; keyboard | `pd-workflows/accessibility-audit.md`, `craft/craft-core.md` (hierarchy через несколько сигналов) | `screens.md` | research, IA |
 | **Component documentation** | дока компонента, doc | «Напиши доку», «опиши API», README для компонента | `pd-workflows/component-documentation.md`, `design-system/component-anatomy.md` | `design-system.md` | research, IA |
 | **Bug / code diagnostics** | баг, ошибка, не работает, fix | Stack trace / error в сообщении; «не запускается» | `code-diagnostics/code-diagnostics.md`, `meta/calibration.md`. При frontend — `platforms/frontend-implementation-rules.md` | `project-state.md` (контекст) | research, IA, DS |
-| **Pipeline / orchestration** | meta, оркестрация, pipeline | Вопросы «где мы», «что дальше», координация stages | `meta/pipeline-orchestration.md`, `meta/artifact-contracts.md`, `meta/operating-principles.md` | `project-state.md`, все relevant artifacts | content, mobile |
+| **Pipeline / orchestration** | meta, оркестрация, pipeline, где мы, что дальше | Вопросы «где мы», «что дальше», координация stages | `meta/pipeline-orchestration.md`, `meta/artifact-contracts.md`, `meta/operating-principles.md` | `project-state.md`, все relevant artifacts | content, mobile |
+| **Неоднозначное решение** | совет, council, второе мнение, взвесь варианты | Несколько разумных путей, нет очевидного победителя; go / no-go | скилл `council`, `meta/anti-sycophancy.md` | `project-state.md` (Lineage) | implementation |
+| **Новый скилл** | создай скилл, новый скилл, есть ли скилл | Собираешься предложить или создать скилл | скилл `skill-scout`, `skills/README.md` | — | research, DS |
+| **Цикл обучения / инстинкты** | инстинкт, distill, дистилляция, что система выучила | «разбери сессии», «обнови инстинкты», промоушен выученного в правила | `meta/learning-loop.md` | — | DS, craft, research |
 
 ## Когда читать `artifacts/research/*`
 
@@ -74,6 +81,7 @@
 | Случай | Действие |
 |---|---|
 | Задача затрагивает 2+ типов | Читай файлы из обеих категорий, но **минимум общих** |
+| Craft / деталь / движение — неясно, что именно | Правило масштаба: экран целиком → `craft-audit`; одна деталь → `make-interfaces-feel-better`; «как надо?» → `emil-design-eng`; конкретная работа с движением → профильный скилл. Полная таблица — `skills/README.md` |
 | Тип неясен | Спроси пользователя «это про X или Y?» — не угадывай |
 | Локальный `memory-bank/` в проекте есть | **Supplement, не replacement.** Используй для project-specific knowledge. Core `AGENTS.md` + tool roles + этот index — **остаются global** |
 | Локальный `artifacts/project-state.md` | **Читать первым**, до любых rules |

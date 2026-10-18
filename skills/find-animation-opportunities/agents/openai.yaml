@@ -1,0 +1,6 @@
+interface:
+  display_name: "Find Animation Opportunities"
+  short_description: "Где стоит добавить движение, а где не стоит"
+  default_prompt: "Use $find-animation-opportunities to find where motion would help and where it would not."
+policy:
+  allow_implicit_invocation: true

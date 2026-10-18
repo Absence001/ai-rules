@@ -1,0 +1,6 @@
+interface:
+  display_name: "Council"
+  short_description: "Четыре голоса до неоднозначного решения"
+  default_prompt: "Use $council to weigh an ambiguous decision with four independent voices."
+policy:
+  allow_implicit_invocation: true

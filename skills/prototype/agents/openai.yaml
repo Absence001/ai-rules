@@ -1,0 +1,6 @@
+interface:
+  display_name: "Prototype Variants"
+  short_description: "Несколько разных версий UI с живым переключателем"
+  default_prompt: "Use $prototype to build several variants of a UI piece to compare."
+policy:
+  allow_implicit_invocation: false

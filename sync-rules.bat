@@ -6,6 +6,7 @@ echo Syncing ai-rules globally...
 set RULES_ROOT=%USERPROFILE%\ai-rules
 set CODEX_HOME=%USERPROFILE%\.codex
 set CLAUDE_HOME=%USERPROFILE%\.claude
+set AGENTS_HOME=%USERPROFILE%\.agents
 
 REM ============================================================
 REM Codex: ~/.codex/AGENTS.md = AGENTS.md + codex/AGENTS.md + bootstrap
@@ -82,6 +83,49 @@ if %errorlevel%==0 (
     echo [OK] %CLAUDE_HOME%\skills synced ^(!SKILL_COUNT! skills^)
 ) else (
     echo [ERROR] Failed to sync Skills
+)
+
+REM ============================================================
+REM Codex Skills: Codex — основной рантайм, скиллы обязаны доезжать и к нему.
+REM Пишем в обе известные локации: $CODEX_HOME\skills и ~\.agents\skills —
+REM какую именно читает конкретная версия Codex, зависит от версии.
+REM xcopy только добавляет и перезаписывает: сторонние скиллы (Emil и пр.) не трогаются.
+REM ============================================================
+echo.
+echo --- Codex Skills sync ---
+
+if not exist "%CODEX_HOME%\skills" mkdir "%CODEX_HOME%\skills"
+xcopy /E /Y /I /Q "%RULES_ROOT%\skills" "%CODEX_HOME%\skills" >nul
+if errorlevel 1 (
+    echo [ERROR] Failed to sync Skills to %CODEX_HOME%\skills
+) else (
+    echo [OK] %CODEX_HOME%\skills synced ^(!SKILL_COUNT! skills^)
+)
+
+if not exist "%AGENTS_HOME%\skills" mkdir "%AGENTS_HOME%\skills"
+xcopy /E /Y /I /Q "%RULES_ROOT%\skills" "%AGENTS_HOME%\skills" >nul
+if errorlevel 1 (
+    echo [ERROR] Failed to sync Skills to %AGENTS_HOME%\skills
+) else (
+    echo [OK] %AGENTS_HOME%\skills synced ^(!SKILL_COUNT! skills^)
+)
+
+REM ============================================================
+REM Hooks: guard-hook + цикл обучения в оба рантайма.
+REM Скрипт мержит JSON, сохраняя чужие записи (mcpServers, плагины, чужие хуки).
+REM Подробности — memory-bank/meta/learning-loop.md
+REM ============================================================
+echo.
+echo --- Hooks install ---
+
+where node >nul 2>nul
+if errorlevel 1 (
+    echo [WARN] node не найден — пропускаю установку хуков
+) else (
+    node "%RULES_ROOT%\scripts\install-hooks.mjs"
+    if errorlevel 1 (
+        echo [ERROR] install-hooks не смог записать конфиги, см. вывод выше
+    )
 )
 
 REM ============================================================

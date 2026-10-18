@@ -1,0 +1,6 @@
+interface:
+  display_name: "Animation Performance"
+  short_description: "Анимация роняет кадры: причина и починка"
+  default_prompt: "Use $animation-performance to fix an animation that drops frames."
+policy:
+  allow_implicit_invocation: true

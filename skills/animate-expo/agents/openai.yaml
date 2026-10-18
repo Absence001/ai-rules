@@ -1,0 +1,6 @@
+interface:
+  display_name: "Animate (Expo)"
+  short_description: "Анимация в React Native и Expo: жесты, шиты, хаптика"
+  default_prompt: "Use $animate-expo to animate something in a React Native or Expo app."
+policy:
+  allow_implicit_invocation: true

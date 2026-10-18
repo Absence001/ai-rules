@@ -1,0 +1,6 @@
+interface:
+  display_name: "Write Swift"
+  short_description: "Современный Swift: value types, конкурентность, тестирование"
+  default_prompt: "Use $write-swift to write or review modern Swift."
+policy:
+  allow_implicit_invocation: true
