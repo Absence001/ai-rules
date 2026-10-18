@@ -20,6 +20,8 @@ try {
 
   const project = detectProject(input.cwd);
   const ranked = listInstincts(project)
+    // ставший правилом инстинкт уже раздаётся через memory-bank — второй раз не платим токенами
+    .filter((i) => !i.meta.promoted_to)
     .map((i) => ({ ...i, effective: decayed(i.meta) }))
     .filter((i) => i.effective >= THRESHOLD)
     // проектные вперёд глобальных при равной уверенности: они конкретнее

@@ -93,11 +93,28 @@ ai-rules/
 
 `sync-rules.bat` раскладывает хуки по обоим рантаймам через `scripts/install-hooks.mjs`:
 
-| Хук | Событие | Что делает |
+| Хук | Событие | Что делает | Режим |
+|---|---|---|---|
+| `guard-hook.mjs` | PreToolUse | блокирует всегда-запрещённые команды | блок |
+| `observe.mjs` | PostToolUse, UserPromptSubmit | пишет наблюдения сессии | молча |
+| `inject-instincts.mjs` | SessionStart | подмешивает выученные инстинкты (≥0.7) | контекст |
+| `anti-slop-check.mjs` | PostToolUse (фронтенд-файлы) | признаки AI-look из `anti-slop-audit.md` | предупреждение |
+| `routing-hint.mjs` | UserPromptSubmit | тип задачи по `rules-index.md`: что читать, что не грузить | подсказка |
+| `delivery-gate.mjs` | Stop | артефакты менялись, а `project-state.md` — нет | предупреждение / блок |
+
+Последние три по умолчанию **только предупреждают** и не повторяют одно и то же за сессию.
+Настройка — переменными окружения или `%LOCALAPPDATA%\ai-rules-learning\config.json`:
+
+| Переменная | Значения | По умолчанию |
 |---|---|---|
-| `guard-hook.mjs` | PreToolUse | блокирует всегда-запрещённые команды |
-| `observe.mjs` | PostToolUse, UserPromptSubmit | пишет наблюдения сессии |
-| `inject-instincts.mjs` | SessionStart | подмешивает выученные инстинкты |
+| `AI_RULES_ENFORCE` | `off` — выключить все три | — |
+| `AI_RULES_ANTISLOP` | `warn` / `off` | `warn` |
+| `AI_RULES_ROUTING_HINT` | `warn` / `off` | `warn` |
+| `AI_RULES_DELIVERY_GATE` | `warn` / `block` / `off` | `warn` |
+
+```json
+{ "enforce": { "deliveryGate": "block" } }
+```
 
 **Codex требует подтвердить хуки:** запусти `/hooks` в Codex CLI. Доверие привязано к хешу,
 поэтому после каждого изменения скриптов его нужно подтвердить заново.
@@ -127,6 +144,20 @@ Skill `project-init` делает шаги 2-3 автоматически (см.
 3. Опционально создать `<project>/memory-bank/<category>/<file>.md` для project-specific knowledge
 
 ⚠️ Local override **fork**ит правила: изменения в `RULES_ROOT` не подхватятся автоматически. Использовать **только** когда global rules реально недостаточны.
+
+## Тесты
+
+Скрипты системы покрыты тестами на встроенном `node:test` (без зависимостей):
+
+```bash
+node --test "scripts/test/*.test.mjs"
+```
+
+guard-hook (блок и пропуск, включая регрессию путей Git Bash), цикл обучения
+(рост уверенности, порог инжекта, промоушен, приватность патчей), хуки Ф3
+(включая ложные срабатывания на то, что рекомендуют первоисточники) и установщик
+(идемпотентность, сохранение чужих конфигов, битый JSON). Тесты работают во временных
+каталогах — реальные наблюдения и конфиги не трогаются.
 
 ## Обновление правил
 

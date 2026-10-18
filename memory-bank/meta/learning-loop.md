@@ -94,7 +94,21 @@ node scripts/instincts.mjs correct <id>      # опровергнуть
 node scripts/instincts.mjs promote           # project → global
 node scripts/instincts.mjs prune             # убрать выдохшиеся
 node scripts/instincts.mjs projects          # известные проекты
+node scripts/instincts.mjs draft-rule <id>   # черновик правила для memory-bank (ничего не пишет)
+node scripts/instincts.mjs mark-promoted <id> memory-bank/<файл>.md
+                                             # инстинкт стал правилом → больше не инжектится
 ```
+
+## Промоушен в правило — последний шаг
+
+1. `promote` — кандидаты project → global (≥0.9 в 2+ проектах).
+2. `draft-rule <id>` — черновик строки правила, целевой файл по домену и список похожих
+   строк в нём (проверка на дубль). **Ничего не пишет.**
+3. Вставку в `memory-bank/` делает **пользователь** после трёх «да»: правило объяснимо без
+   истории наблюдений; не противоречит первоисточникам (движение и детали — скиллы
+   Эмиля и MIFB, `AGENTS.md`); это не дубль.
+4. `mark-promoted <id> <путь>` — инстинкт помечен. Больше не инжектится: правило уже
+   раздаётся через `sync-rules.bat`, платить за него токенами дважды незачем.
 
 Разбор наблюдений — скилл `distill`.
 
@@ -119,8 +133,14 @@ node scripts/instincts.mjs projects          # известные проекты
 
 ## Отключить
 
-Убрать блок `hooks` из `~/.codex/hooks.json` и `~/.claude/settings.json`.
-Накопленные инстинкты останутся на диске и заработают снова при возврате хуков.
+```bash
+node scripts/install-hooks.mjs --remove
+```
+
+Убирает только хуки ai-rules из `~/.codex/hooks.json` и `~/.claude/settings.json`,
+чужие записи сохраняются. Накопленные инстинкты остаются на диске и заработают снова
+после `sync-rules.bat`. Принуждающие хуки (anti-slop, routing-hint, delivery-gate)
+отключаются отдельно — `AI_RULES_ENFORCE=off`, см. `README.md`.
 
 ## Связь с другими правилами
 

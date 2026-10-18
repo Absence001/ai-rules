@@ -9,7 +9,7 @@
 // Приватность: сохраняем промпты и ЦЕЛИ инструментов (путь, голова команды),
 // но никогда не содержимое файлов и не вывод инструментов.
 
-import { appendObservation, detectProject, registerProject, readStdin } from "./lib/learning.mjs";
+import { appendObservation, detectProject, registerProject, readStdin, extractFiles } from "./lib/learning.mjs";
 
 const MAX_PROMPT = 2000;
 const MAX_TARGET = 300;
@@ -19,7 +19,10 @@ function targetOf(toolName, input) {
   const t =
     input.file_path || input.path || input.notebook_path ||
     input.command || input.pattern || input.url || "";
-  return String(t).slice(0, MAX_TARGET);
+  const s = Array.isArray(t) ? t.join(" ") : String(t);
+  // Codex может передать патч через command[] — это код, а не цель. Не храним.
+  if (s.includes("*** Begin Patch")) return "";
+  return s.slice(0, MAX_TARGET);
 }
 
 function ok(response) {
@@ -55,11 +58,14 @@ try {
     // PostToolUse (и всё остальное, что повесили на этот скрипт)
     const tool = input.tool_name || "";
     if (tool) {
+      const files = extractFiles(input.tool_input);
       appendObservation(project, {
         kind: "tool",
         session: input.session_id || "",
         tool,
-        target: targetOf(tool, input.tool_input),
+        // у apply_patch цели нет в полях — берём первый файл из патча
+        target: targetOf(tool, input.tool_input) || files[0] || "",
+        ...(files.length ? { files } : {}),
         ok: ok(input.tool_response),
       });
     }

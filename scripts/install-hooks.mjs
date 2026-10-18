@@ -45,12 +45,21 @@ const claudeHooks = {
   PostToolUse: [{
     matcher: "*",
     hooks: [{ type: "command", command: "node", args: [join(SCRIPTS, "observe.mjs")], timeout: 10 }],
+  }, {
+    matcher: "Write|Edit|MultiEdit",
+    hooks: [{ type: "command", command: "node", args: [join(SCRIPTS, "anti-slop-check.mjs")], timeout: 10 }],
   }],
   UserPromptSubmit: [{
-    hooks: [{ type: "command", command: "node", args: [join(SCRIPTS, "observe.mjs")], timeout: 10 }],
+    hooks: [
+      { type: "command", command: "node", args: [join(SCRIPTS, "observe.mjs")], timeout: 10 },
+      { type: "command", command: "node", args: [join(SCRIPTS, "routing-hint.mjs")], timeout: 10 },
+    ],
   }],
   SessionStart: [{
     hooks: [{ type: "command", command: "node", args: [join(SCRIPTS, "inject-instincts.mjs")], timeout: 10 }],
+  }],
+  Stop: [{
+    hooks: [{ type: "command", command: "node", args: [join(SCRIPTS, "delivery-gate.mjs")], timeout: 10 }],
   }],
 };
 
@@ -63,14 +72,24 @@ const codexHooks = {
   }],
   PostToolUse: [{
     matcher: ".*",
-    hooks: [{ type: "command", command: `node "${script("observe.mjs")}"`, timeout: 10 }],
+    hooks: [
+      { type: "command", command: `node "${script("observe.mjs")}"`, timeout: 10 },
+      // имя инструмента правки у Codex другое (apply_patch) — фильтр по расширению внутри скрипта
+      { type: "command", command: `node "${script("anti-slop-check.mjs")}"`, timeout: 10 },
+    ],
   }],
   UserPromptSubmit: [{
-    hooks: [{ type: "command", command: `node "${script("observe.mjs")}"`, timeout: 10 }],
+    hooks: [
+      { type: "command", command: `node "${script("observe.mjs")}"`, timeout: 10 },
+      { type: "command", command: `node "${script("routing-hint.mjs")}"`, timeout: 10 },
+    ],
   }],
   SessionStart: [{
     matcher: ".*",
     hooks: [{ type: "command", command: `node "${script("inject-instincts.mjs")}"`, timeout: 10 }],
+  }],
+  Stop: [{
+    hooks: [{ type: "command", command: `node "${script("delivery-gate.mjs")}"`, timeout: 10 }],
   }],
 };
 

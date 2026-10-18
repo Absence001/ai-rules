@@ -10,6 +10,7 @@
 //   R4 secret        — hardcoded API-ключи/токены в правилах
 //   R5 skill-shape   — skills/* в kebab-case, есть SKILL.md с name/description
 //   R6 sync-drift    — ~/.codex/AGENTS.md совпадает с источником (AGENTS.md + codex/AGENTS.md)
+//   R7 skill-routing — каждый скилл в skills/README.md; craft/motion-скиллы разведены
 
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { join, relative, basename, extname } from "node:path";
@@ -232,6 +233,52 @@ try {
   }
 } catch (e) {
   add("warn", "R6 sync-drift", "~/.codex/AGENTS.md", `не удалось проверить: ${e.message}`);
+}
+
+// R7 skill-routing — каждый скилл достижим маршрутизацией, craft/motion-скиллы разведены.
+//
+// Почему не лексическое сходство описаний (как skill-stocktake у ECC): проверено на
+// 435 парах — максимум 0.10, а реальные пересечения (craft-audit ↔ emil-design-eng)
+// не видны вовсе: наши описания на русском, Эмиля — на английском, общих слов нет.
+// Поэтому проверяем детерминированный признак, а не похожесть текста:
+//   R7a — скилл упомянут в skills/README.md (иначе добавлен молча и ни к чему не привязан);
+//   R7b — скилл, касающийся движения или полировки, либо есть в таблице разведения,
+//         либо сам в описании отсылает к разведённому скиллу («for motion use X»).
+function skillDescription(text) {
+  const fm = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!fm) return "";
+  const lines = fm[1].split(/\r?\n/);
+  const i = lines.findIndex((l) => /^description\s*:/.test(l));
+  if (i < 0) return "";
+  const out = [lines[i].replace(/^description\s*:\s*(?:>-?|\|)?\s*/, "")];
+  for (let j = i + 1; j < lines.length && /^\s+\S/.test(lines[j]); j++) out.push(lines[j].trim());
+  return out.join(" ").toLowerCase();
+}
+
+{
+  const readme = join(ROOT, "skills", "README.md");
+  if (existsSync(readme) && existsSync(skillsDir)) {
+    const readmeText = readFileSync(readme, "utf8");
+    const routingSection = (readmeText.split(/^## Разведение пересекающихся скиллов/m)[1] || "").split(/^## /m)[0];
+    const mentioned = (text, name) => new RegExp(`\`${name}\``).test(text);
+    const names = readdirSync(skillsDir).filter((n) => existsSync(join(skillsDir, n, "SKILL.md")));
+    const routed = names.filter((n) => mentioned(routingSection, n));
+    // без «craft»: это слово встречается как название этапа пайплайна (pipeline-control),
+    // а сам craft-audit и так в таблице разведения
+    const CRAFT = /animat|анимац|motion|движени|easing|polish|полиров|hover|spring|пружин/;
+
+    for (const n of names) {
+      if (!mentioned(readmeText, n))
+        add("warn", "R7 skill-routing", `skills/${n}`, "скилл не упомянут в skills/README.md — добавлен молча, маршрута нет");
+
+      const desc = skillDescription(readFileSync(join(skillsDir, n, "SKILL.md"), "utf8"));
+      if (!CRAFT.test(desc) || routed.includes(n)) continue;
+      const selfRouted = routed.some((r) => r !== n && new RegExp(`(^|[^a-z-])${r}([^a-z-]|$)`).test(desc));
+      if (!selfRouted)
+        add("warn", "R7 skill-routing", `skills/${n}`,
+          "касается движения/полировки, но не разведён: добавь в таблицу «Разведение» в skills/README.md");
+    }
+  }
 }
 
 // ── отчёт ────────────────────────────────────────────────────────────────────

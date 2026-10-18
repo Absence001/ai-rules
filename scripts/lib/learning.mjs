@@ -160,7 +160,10 @@ function instinctDirFor(project, scope) {
 
 export function listInstincts(project) {
   const out = [];
-  for (const scope of ["project", "global"]) {
+  // Вне git-репозитория проект = global, и каталоги «проекта» и «global» совпадают:
+  // без этой проверки каждый инстинкт читался бы и инжектился дважды.
+  const scopes = project.id === "global" ? ["global"] : ["project", "global"];
+  for (const scope of scopes) {
     const dir = instinctDirFor(project, scope);
     if (!existsSync(dir)) continue;
     for (const f of readdirSync(dir)) {
@@ -193,6 +196,92 @@ function atomicWrite(path, content) {
   const tmp = `${path}.tmp-${process.pid}`;
   writeFileSync(tmp, content, "utf8");
   renameSync(tmp, path);
+}
+
+// ── какие файлы затронул вызов инструмента ───────────────────────────────────
+// Claude: tool_input.file_path / edits[].file_path. Codex: apply_patch, где пути
+// лежат внутри текста патча («*** Update File: path»). Без разбора патча хуки
+// Ф3 были бы слепы в основном рантайме.
+const PATCH_FILE_RE = /^\*\*\* (?:Update|Add|Delete) File: (.+)$/gm;
+const PATCH_MOVE_RE = /^\*\*\* Move to: (.+)$/gm;
+
+export function extractFiles(toolInput) {
+  if (!toolInput || typeof toolInput !== "object") return [];
+  const out = new Set();
+  for (const k of ["file_path", "path", "notebook_path"]) {
+    if (typeof toolInput[k] === "string" && toolInput[k]) out.add(toolInput[k]);
+  }
+  if (Array.isArray(toolInput.edits)) {
+    for (const e of toolInput.edits) if (e && typeof e.file_path === "string") out.add(e.file_path);
+  }
+  // текст патча может лежать в любом строковом поле (input, patch, command[])
+  const strings = [];
+  for (const v of Object.values(toolInput)) {
+    if (typeof v === "string") strings.push(v);
+    else if (Array.isArray(v)) for (const x of v) if (typeof x === "string") strings.push(x);
+  }
+  for (const s of strings) {
+    if (!s.includes("*** Begin Patch")) continue;
+    for (const re of [PATCH_FILE_RE, PATCH_MOVE_RE]) {
+      re.lastIndex = 0;
+      let m;
+      while ((m = re.exec(s))) out.add(m[1].trim());
+    }
+  }
+  return [...out];
+}
+
+// ── конфиг принуждающих хуков (Ф3) ───────────────────────────────────────────
+// Приоритет: значения по умолчанию < config.json в каталоге данных < env.
+// По умолчанию всё только ПРЕДУПРЕЖДАЕТ — блокировать умеет лишь delivery-gate,
+// и только если явно включить.
+const ENFORCE_DEFAULTS = {
+  antislop: "warn",       // warn | off
+  routingHint: "warn",    // warn | off
+  deliveryGate: "warn",   // warn | block | off
+};
+
+export function enforceConfig() {
+  let file = {};
+  try { file = JSON.parse(readFileSync(join(dataRoot(), "config.json"), "utf8")).enforce || {}; } catch { file = {}; }
+  const cfg = { ...ENFORCE_DEFAULTS, ...file };
+  const env = process.env;
+  if ((env.AI_RULES_ENFORCE || "").toLowerCase() === "off") {
+    return { antislop: "off", routingHint: "off", deliveryGate: "off" };
+  }
+  if (env.AI_RULES_ANTISLOP) cfg.antislop = env.AI_RULES_ANTISLOP.toLowerCase();
+  if (env.AI_RULES_ROUTING_HINT) cfg.routingHint = env.AI_RULES_ROUTING_HINT.toLowerCase();
+  if (env.AI_RULES_DELIVERY_GATE) cfg.deliveryGate = env.AI_RULES_DELIVERY_GATE.toLowerCase();
+  return cfg;
+}
+
+// ── состояние в пределах сессии (чтобы не повторять одно предупреждение) ─────
+// Каждое повторение одного и того же предупреждения — это токены пользователя.
+const STATE_TTL_MS = 3 * 86400000;
+
+export function loadSessionState(name, sessionId) {
+  const file = join(ensureDir(join(dataRoot(), "state")), `${name}.json`);
+  let all = {};
+  try { all = JSON.parse(readFileSync(file, "utf8")); } catch { all = {}; }
+  return { file, all, entry: (sessionId && all[sessionId]) || null };
+}
+
+export function saveSessionState(state, sessionId, entry) {
+  if (!sessionId) return;
+  const now = Date.now();
+  const all = {};
+  for (const [k, v] of Object.entries(state.all)) {
+    if (v && typeof v.ts === "number" && now - v.ts < STATE_TTL_MS) all[k] = v;
+  }
+  all[sessionId] = { ...entry, ts: now };
+  try { atomicWrite(state.file, `${JSON.stringify(all)}\n`); } catch { /* состояние — вспомогательное */ }
+}
+
+// ── вывод в контекст модели (общий контракт Codex и Claude Code) ─────────────
+export function emitContext(eventName, text) {
+  process.stdout.write(JSON.stringify({
+    hookSpecificOutput: { hookEventName: eventName, additionalContext: text },
+  }));
 }
 
 // ── чтение stdin хука ────────────────────────────────────────────────────────

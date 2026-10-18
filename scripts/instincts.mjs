@@ -9,6 +9,10 @@
 //   node scripts/instincts.mjs promote [id]        проект → global (кандидаты: >=0.9 в 2+ проектах)
 //   node scripts/instincts.mjs prune               удалить выдохшиеся (effective <= 0)
 //   node scripts/instincts.mjs projects            известные проекты
+//   node scripts/instincts.mjs draft-rule <id>     черновик правила для memory-bank (ничего не пишет)
+//   node scripts/instincts.mjs mark-promoted <id> <memory-bank/путь.md>
+//                                                  отметить, что инстинкт стал правилом —
+//                                                  после этого он больше не инжектится
 //
 // add-флаги: --id --trigger --action --domain --scope=project|global
 //
@@ -16,7 +20,8 @@
 // делает пользователь через ревью. См. memory-bank/meta/learning-loop.md.
 
 import { existsSync, readFileSync, readdirSync, rmSync } from "node:fs";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   dataRoot, detectProject, projectDir, listInstincts, writeInstinct,
   readObservations, parseInstinct, decayed, today, DOMAINS, CONFIDENCE,
@@ -24,6 +29,24 @@ import {
 
 const [, , cmd = "status", ...rest] = process.argv;
 const project = detectProject(process.cwd());
+const RULES_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+// Куда по умолчанию ложится правило каждого домена
+const RULE_TARGETS = {
+  "research": "discovery/srgid-research-core.md",
+  "ia": "ia-flow/ia-rules.md",
+  "design-system": "design-system/design-system-core.md",
+  "craft": "craft/craft-core.md",
+  "figma": "design-system/figma-code-parity.md",
+  "frontend": "platforms/frontend-implementation-rules.md",
+  "pipeline": "meta/pipeline-orchestration.md",
+  "communication": "meta/operating-principles.md",
+};
+
+const STOP = new Set(["когда", "если", "нужно", "надо", "сначала", "потом", "чтобы", "этот", "этого", "только", "через", "перед", "после"]);
+function significant(text) {
+  return [...new Set(text.toLowerCase().split(/[^\p{L}\p{N}-]+/u).filter((w) => w.length >= 5 && !STOP.has(w)))];
+}
 
 function flag(name, fallback = "") {
   const hit = rest.find((a) => a.startsWith(`--${name}=`));
@@ -76,8 +99,9 @@ switch (cmd) {
       for (const i of group.sort((a, b) => decayed(b.meta) - decayed(a.meta))) {
         const eff = decayed(i.meta);
         const stale = eff < Number(i.meta.confidence) ? ` ↓с ${Number(i.meta.confidence).toFixed(2)}` : "";
-        const live = eff >= CONFIDENCE.STRONG ? "✓" : " ";
-        console.log(`${live} ${bar(eff)} ${eff.toFixed(2)}${stale}  ${i.meta.id}  [${i.meta.domain}]`);
+        const promoted = i.meta.promoted_to ? `  → правило: ${i.meta.promoted_to}` : "";
+        const live = !i.meta.promoted_to && eff >= CONFIDENCE.STRONG ? "✓" : " ";
+        console.log(`${live} ${bar(eff)} ${eff.toFixed(2)}${stale}  ${i.meta.id}  [${i.meta.domain}]${promoted}`);
         console.log(`     ${i.meta.trigger} → ${i.meta.action}`);
       }
       console.log("");
@@ -193,7 +217,71 @@ switch (cmd) {
     break;
   }
 
+  case "draft-rule": {
+    const id = rest[0];
+    const hit = id && findById(id);
+    if (!hit) { console.error(`не найден инстинкт: ${id || "(id не указан)"}`); process.exit(1); }
+    const m = hit.meta;
+    const eff = decayed(m);
+    const target = RULE_TARGETS[m.domain] || "meta/operating-principles.md";
+    const targetAbs = join(RULES_ROOT, "memory-bank", target);
+
+    console.log(`Инстинкт: ${m.id}  (${m.domain}, уверенность ${eff.toFixed(2)}, scope ${hit.scope})`);
+    console.log(`Цель:     memory-bank/${target}\n`);
+    if (m.promoted_to) console.log(`⚠ Уже перенесён в ${m.promoted_to}.\n`);
+    if (eff < CONFIDENCE.CERTAIN) {
+      console.log(`⚠ Уверенность ${eff.toFixed(2)} ниже порога промоушена ${CONFIDENCE.CERTAIN}. Переносить рано.\n`);
+    }
+
+    console.log("──── черновик для вставки ────");
+    console.log(`- **${m.trigger}** → ${m.action}`);
+    console.log(`  *Выведено из сессий: инстинкт \`${m.id}\`, подтверждений ${m.observations || 0}, ` +
+      `опровержений ${m.corrections || 0}, ${today()}.*`);
+    console.log("──────────────────────────────\n");
+
+    // возможные дубли: строки цели, где встречаются те же значимые слова
+    if (existsSync(targetAbs)) {
+      const words = significant(`${m.trigger} ${m.action}`);
+      const lines = readFileSync(targetAbs, "utf8").split(/\r?\n/);
+      const near = lines
+        .map((l, i) => ({ i: i + 1, l, n: words.filter((w) => l.toLowerCase().includes(w)).length }))
+        .filter((x) => x.n >= 2)
+        .sort((a, b) => b.n - a.n)
+        .slice(0, 5);
+      if (near.length) {
+        console.log("Возможно, уже есть похожее правило — сверь перед вставкой:");
+        for (const x of near) console.log(`  ${target}:${x.i}  ${x.l.trim().slice(0, 110)}`);
+        console.log("");
+      }
+    }
+
+    console.log("Перед вставкой ответь «да» на все три:");
+    console.log("  1. Правило объяснимо без ссылки на историю наблюдений?");
+    console.log("  2. Не противоречит первоисточникам (движение и детали — скиллы Эмиля/MIFB, AGENTS.md)?");
+    console.log("  3. Это не дубль существующего правила?");
+    console.log(`\nПосле вставки: node scripts/instincts.mjs mark-promoted ${m.id} memory-bank/${target}`);
+    break;
+  }
+
+  case "mark-promoted": {
+    const [id, rulePath] = rest;
+    const hit = id && findById(id);
+    if (!hit || !rulePath) {
+      console.error("использование: mark-promoted <id> <memory-bank/путь.md>");
+      process.exit(1);
+    }
+    const rel = rulePath.replaceAll("\\", "/").replace(/^\.?\//, "");
+    if (!rel.startsWith("memory-bank/") || !existsSync(join(RULES_ROOT, rel))) {
+      console.error(`нет такого файла правил: ${rel} (ожидается путь внутри memory-bank/)`);
+      process.exit(1);
+    }
+    const meta = { ...hit.meta, promoted_to: rel, updated: today() };
+    writeInstinct(project, meta, `${hit.body.trim()}\n- ${today()} — перенесён в правило ${rel}`);
+    console.log(`${id}: стал правилом в ${rel}. Больше не инжектится — правило раздаётся через sync-rules.bat.`);
+    break;
+  }
+
   default:
-    console.error(`неизвестная команда: ${cmd}\nдоступно: status, observations, add, reinforce, correct, promote, prune, projects`);
+    console.error(`неизвестная команда: ${cmd}\nдоступно: status, observations, add, reinforce, correct, promote, prune, projects, draft-rule, mark-promoted`);
     process.exit(1);
 }

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Skill Scout"
+  short_description: "Найти, не покрыта ли задача, прежде чем создавать скилл"
+  default_prompt: "Use $skill-scout to check whether a skill already covers this before creating one."
+policy:
+  allow_implicit_invocation: true

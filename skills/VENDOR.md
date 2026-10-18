@@ -87,6 +87,23 @@ SOFTWARE.
 
 ---
 
+## Адаптированные из everything-claude-code
+
+Не вендоринг, а переработка: идея и структура взяты, текст написан заново под эту систему,
+поэтому наши `SKILL.md` **редактируются** как свои.
+
+- **Источник:** https://github.com/affaan-m/everything-claude-code (MIT)
+- **Адаптировано 2026-10-18:**
+
+| Наш скилл / файл | Источник в ECC | Что изменено |
+|---|---|---|
+| `distill` + `scripts/observe.mjs`, `inject-instincts.mjs`, `instincts.mjs` | `skills/continuous-learning-v2` | Node вместо bash+python, без фонового демона, домены пайплайна, промоушен в memory-bank |
+| `council` | `skills/council` | Four Big Risks в вердикте, запись в Decision Lineage, честность о якоре без подагентов |
+| `skill-scout` | `skills/skill-scout` | Codex-локации, вендоринг, правила R7, поиск на двух языках |
+| `scripts/anti-slop-check.mjs` | `design-quality-check.js` (хук ECC) | Сигналы из нашего `anti-slop-audit.md`, сверены с первоисточниками |
+| `scripts/delivery-gate.mjs` | `skills/delivery-gate` | Условие «артефакты менялись → project-state обновлён» вместо тестов |
+| Самооценка в `memory-bank/meta/calibration.md` | `skills/agent-self-evaluation` | Встроена в калибровку, связана с циклом обучения |
+
 ## Прочие внешние скиллы
 
 | Скилл | Происхождение | Статус |
